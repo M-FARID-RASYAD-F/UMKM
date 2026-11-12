@@ -300,6 +300,11 @@
                 <option value="">— Ketuk untuk memilih event aktif —</option>
               </select>
             </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-light border rounded-circle shadow-none p-0 d-flex align-items-center justify-content-center" id="btnRefreshCounting" onclick="refreshCountingData()" title="Segarkan Data & Stok Event" style="width:40px;height:40px;">
+                <i class="bi bi-arrow-clockwise fs-5 text-secondary" id="iconRefreshCounting"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -371,23 +376,49 @@
             </div>
             <div class="card-body">
 
-              <!-- Toggle Jenis Produk -->
+              <!-- Segmented Toggle Jenis Produk -->
               <div class="mb-3">
-                <div class="btn-group w-100" role="group">
+                <div class="segmented-pos-group w-100" role="group">
                   <input type="radio" class="btn-check" name="countJenisProduk" id="jPin" value="pin" checked>
-                  <label class="btn btn-outline-warning fw-bold py-2" for="jPin">
+                  <label class="btn" for="jPin">
                     <i class="bi bi-pin-angle-fill"></i> Pin Saja
                   </label>
 
                   <input type="radio" class="btn-check" name="countJenisProduk" id="jGk" value="gk">
-                  <label class="btn btn-outline-info fw-bold py-2" for="jGk">
+                  <label class="btn" for="jGk">
                     <i class="bi bi-key-fill"></i> GK Saja
                   </label>
 
                   <input type="radio" class="btn-check" name="countJenisProduk" id="jCamp" value="campuran">
-                  <label class="btn btn-outline-primary fw-bold py-2" for="jCamp">
+                  <label class="btn" for="jCamp">
                     <i class="bi bi-bag-plus-fill"></i> Campuran
                   </label>
+                </div>
+              </div>
+
+              <!-- Quick Combo Preset Bar (One-Touch Package) -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <small class="fw-bold text-muted text-uppercase" style="font-size:0.73rem; letter-spacing:0.04em;">
+                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Paket Cepat (One-Touch)
+                  </small>
+                </div>
+                <div class="d-flex flex-wrap gap-1">
+                  <button type="button" class="btn-quick-combo combo-pin" onclick="applyQuickCombo('pin', 1, 0)" title="1 pcs Pin (Rp4.000)">
+                    <i class="bi bi-pin-angle-fill"></i> 1 Pin <span class="badge bg-white text-dark ms-1">4k</span>
+                  </button>
+                  <button type="button" class="btn-quick-combo combo-pin" onclick="applyQuickCombo('pin', 3, 0)" title="3 pcs Pin - Bundel Hemat (Rp10.000)">
+                    <i class="bi bi-pin-angle-fill"></i> 3 Pin <span class="badge bg-warning text-dark ms-1">10k ★</span>
+                  </button>
+                  <button type="button" class="btn-quick-combo combo-gk" onclick="applyQuickCombo('gk', 0, 1)" title="1 pcs Gantungan Kunci (Rp4.000)">
+                    <i class="bi bi-key-fill"></i> 1 GK <span class="badge bg-white text-dark ms-1">4k</span>
+                  </button>
+                  <button type="button" class="btn-quick-combo combo-gk" onclick="applyQuickCombo('gk', 0, 3)" title="3 pcs Gantungan Kunci - Bundel Hemat (Rp10.000)">
+                    <i class="bi bi-key-fill"></i> 3 GK <span class="badge bg-info text-white ms-1">10k ★</span>
+                  </button>
+                  <button type="button" class="btn-quick-combo combo-campur" onclick="applyQuickCombo('campuran', 2, 1)" title="Campuran: 2 Pin + 1 GK (Rp10.000)">
+                    <i class="bi bi-bag-plus-fill"></i> 2 Pin + 1 GK <span class="badge bg-primary text-white ms-1">10k</span>
+                  </button>
                 </div>
               </div>
 
@@ -401,17 +432,18 @@
                     </label>
                     <!-- Fast Preset Buttons -->
                     <div class="d-flex gap-1">
-                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 1)">+1</button>
-                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 3)">+3 (Bundel)</button>
-                      <button type="button" class="preset-chip" onclick="quickSet('countQtyPin', 0)">Reset</button>
+                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 1)" title="Tambah 1 Pin">+1</button>
+                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 3)" title="Tambah 1 Bundel (3 pcs)">+3 <span class="badge bg-white text-dark ms-1 px-1 py-0" style="font-size:0.65rem;">Bundel</span></button>
+                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 6)" title="Tambah 2 Bundel (6 pcs)">+6</button>
+                      <button type="button" class="preset-chip reset-chip" onclick="quickSet('countQtyPin', 0)" title="Reset Pin"><i class="bi bi-x-lg"></i></button>
                     </div>
                   </div>
                   <div class="input-group">
-                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyPin', -1)">
+                    <button type="button" class="btn stepper-btn stepper-btn-minus" id="btnMinusPin" onclick="adjustCounting('countQtyPin', -1)" disabled>
                       <i class="bi bi-dash-lg"></i>
                     </button>
                     <input type="number" class="form-control text-center stepper-input font-mono-num" id="countQtyPin" value="0" min="0" oninput="kalkulasiCounting()">
-                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyPin', 1)">
+                    <button type="button" class="btn stepper-btn stepper-btn-plus" id="btnPlusPin" onclick="adjustCounting('countQtyPin', 1)">
                       <i class="bi bi-plus-lg"></i>
                     </button>
                   </div>
@@ -425,17 +457,18 @@
                     </label>
                     <!-- Fast Preset Buttons -->
                     <div class="d-flex gap-1">
-                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 1)">+1</button>
-                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 3)">+3 (Bundel)</button>
-                      <button type="button" class="preset-chip" onclick="quickSet('countQtyGk', 0)">Reset</button>
+                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 1)" title="Tambah 1 GK">+1</button>
+                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 3)" title="Tambah 1 Bundel (3 pcs)">+3 <span class="badge bg-white text-dark ms-1 px-1 py-0" style="font-size:0.65rem;">Bundel</span></button>
+                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 6)" title="Tambah 2 Bundel (6 pcs)">+6</button>
+                      <button type="button" class="preset-chip reset-chip" onclick="quickSet('countQtyGk', 0)" title="Reset GK"><i class="bi bi-x-lg"></i></button>
                     </div>
                   </div>
                   <div class="input-group">
-                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyGk', -1)">
+                    <button type="button" class="btn stepper-btn stepper-btn-minus" id="btnMinusGk" onclick="adjustCounting('countQtyGk', -1)" disabled>
                       <i class="bi bi-dash-lg"></i>
                     </button>
                     <input type="number" class="form-control text-center stepper-input font-mono-num" id="countQtyGk" value="0" min="0" oninput="kalkulasiCounting()">
-                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyGk', 1)">
+                    <button type="button" class="btn stepper-btn stepper-btn-plus" id="btnPlusGk" onclick="adjustCounting('countQtyGk', 1)">
                       <i class="bi bi-plus-lg"></i>
                     </button>
                   </div>
@@ -457,14 +490,25 @@
                 </div>
               </div>
 
-              <!-- Big Confirmation Button -->
+              <!-- Big Confirmation Button & Safe Undo -->
               <div class="d-grid gap-2">
-                <button class="btn btn-primary btn-pos-confirm" id="countBtnKonfirmasi" onclick="konfirmasiCounting()" disabled>
-                  <span id="countBtnKonfText"><i class="bi bi-check2-circle me-2"></i> Konfirmasi Transaksi</span>
-                  <span id="countBtnKonfSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                <button class="btn btn-pos-confirm w-100" id="countBtnKonfirmasi" onclick="konfirmasiCounting()" disabled>
+                  <div class="d-flex align-items-center justify-content-between px-3 w-100">
+                    <span class="d-flex align-items-center gap-2">
+                      <i class="bi bi-cart3 fs-4" id="countBtnKonfIcon"></i>
+                      <span id="countBtnKonfText">Pilih Produk Terlebih Dahulu</span>
+                      <span id="countBtnKonfSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </span>
+                    <span class="badge bg-white bg-opacity-25 text-white font-mono-num px-2 py-1 fs-6 d-none" id="countBtnKonfPriceBadge">
+                      Rp 0
+                    </span>
+                    <kbd class="d-none d-md-inline-block bg-black bg-opacity-25 text-white border-0 px-2 py-1 rounded" style="font-size:0.75rem;">Enter ↵</kbd>
+                  </div>
                 </button>
-                <button class="btn btn-light text-danger border btn-sm py-2" onclick="undoCountingTransaksi()">
-                  <i class="bi bi-arrow-counterclockwise me-1"></i> Batalkan Transaksi Terakhir (Undo)
+                <button class="btn btn-light text-danger border btn-sm py-2 btn-undo-action" id="countBtnUndo" onclick="handleUndoClick()" data-confirm-state="idle">
+                  <i class="bi bi-arrow-counterclockwise me-1" id="countBtnUndoIcon"></i>
+                  <span id="countBtnUndoText">Batalkan Transaksi Terakhir (Undo)</span>
+                  <span id="countBtnUndoSpinner" class="spinner-border spinner-border-sm d-none"></span>
                 </button>
               </div>
             </div>
@@ -537,19 +581,19 @@
                   <!-- Toggle Jenis Produk Custom -->
                   <div class="col-12">
                     <label class="form-label fw-bold small text-muted mb-1">Jenis Produk Dipesan <span class="text-danger">*</span></label>
-                    <div class="btn-group w-100" role="group">
+                    <div class="segmented-pos-group w-100" role="group">
                       <input type="radio" class="btn-check" name="customJenisProduk" id="cPin" value="pin" checked onchange="toggleCustomProdukInputs()">
-                      <label class="btn btn-outline-warning fw-bold py-2" for="cPin">
+                      <label class="btn" for="cPin">
                         <i class="bi bi-pin-angle-fill"></i> Pin Saja
                       </label>
 
                       <input type="radio" class="btn-check" name="customJenisProduk" id="cGk" value="gk" onchange="toggleCustomProdukInputs()">
-                      <label class="btn btn-outline-info fw-bold py-2" for="cGk">
+                      <label class="btn" for="cGk">
                         <i class="bi bi-key-fill"></i> GK Saja
                       </label>
 
                       <input type="radio" class="btn-check" name="customJenisProduk" id="cCamp" value="campuran" onchange="toggleCustomProdukInputs()">
-                      <label class="btn btn-outline-primary fw-bold py-2" for="cCamp">
+                      <label class="btn" for="cCamp">
                         <i class="bi bi-bag-plus-fill"></i> Campuran
                       </label>
                     </div>
@@ -564,12 +608,14 @@
                       <div class="d-flex gap-1">
                         <button type="button" class="preset-chip pin-chip" onclick="quickAddCustom('customQtyPin', 1)">+1</button>
                         <button type="button" class="preset-chip pin-chip" onclick="quickAddCustom('customQtyPin', 3)">+3</button>
+                        <button type="button" class="preset-chip pin-chip" onclick="quickAddCustom('customQtyPin', 5)">+5</button>
+                        <button type="button" class="preset-chip reset-chip" onclick="quickSetCustom('customQtyPin', 0)" title="Reset Pin"><i class="bi bi-x-lg"></i></button>
                       </div>
                     </div>
                     <div class="input-group">
-                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyPin', -1)"><i class="bi bi-dash-lg"></i></button>
+                      <button type="button" class="btn stepper-btn stepper-btn-minus" id="btnMinusCustomPin" onclick="adjustCustomQty('customQtyPin', -1)"><i class="bi bi-dash-lg"></i></button>
                       <input type="number" class="form-control text-center font-mono-num fw-bold stepper-input" id="customQtyPin" value="1" min="0" oninput="kalkulasiCustomTotal()">
-                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyPin', 1)"><i class="bi bi-plus-lg"></i></button>
+                      <button type="button" class="btn stepper-btn stepper-btn-plus" id="btnPlusCustomPin" onclick="adjustCustomQty('customQtyPin', 1)"><i class="bi bi-plus-lg"></i></button>
                     </div>
                   </div>
 
@@ -582,12 +628,14 @@
                       <div class="d-flex gap-1">
                         <button type="button" class="preset-chip gk-chip" onclick="quickAddCustom('customQtyGk', 1)">+1</button>
                         <button type="button" class="preset-chip gk-chip" onclick="quickAddCustom('customQtyGk', 3)">+3</button>
+                        <button type="button" class="preset-chip gk-chip" onclick="quickAddCustom('customQtyGk', 5)">+5</button>
+                        <button type="button" class="preset-chip reset-chip" onclick="quickSetCustom('customQtyGk', 0)" title="Reset GK"><i class="bi bi-x-lg"></i></button>
                       </div>
                     </div>
                     <div class="input-group">
-                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyGk', -1)"><i class="bi bi-dash-lg"></i></button>
+                      <button type="button" class="btn stepper-btn stepper-btn-minus" id="btnMinusCustomGk" onclick="adjustCustomQty('customQtyGk', -1)"><i class="bi bi-dash-lg"></i></button>
                       <input type="number" class="form-control text-center font-mono-num fw-bold stepper-input" id="customQtyGk" value="0" min="0" oninput="kalkulasiCustomTotal()">
-                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyGk', 1)"><i class="bi bi-plus-lg"></i></button>
+                      <button type="button" class="btn stepper-btn stepper-btn-plus" id="btnPlusCustomGk" onclick="adjustCustomQty('customQtyGk', 1)"><i class="bi bi-plus-lg"></i></button>
                     </div>
                   </div>
 
@@ -610,8 +658,8 @@
                   <div class="col-12 col-md-6">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                       <label class="form-label fw-bold small text-muted mb-0">Total Kesepakatan Harga (Rp) <span class="text-danger">*</span></label>
-                      <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none fw-semibold small" onclick="hitungAutoHargaCustom()">
-                        <i class="bi bi-magic me-1"></i>Tarif Otomatis
+                      <button type="button" class="btn btn-sm btn-outline-warning border-warning-subtle text-dark fw-bold px-2 py-0" onclick="hitungAutoHargaCustom()" title="Kalkulasi otomatis harga bundel">
+                        <i class="bi bi-magic text-warning me-1"></i>Tarif Otomatis
                       </button>
                     </div>
                     <div class="input-group">
@@ -687,8 +735,8 @@
               </h6>
               <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-primary bg-opacity-10 text-primary font-mono-num" id="customTotalSummary">0 pesanan</span>
-                <button class="btn btn-sm btn-light border" onclick="loadPesananCustomList()" title="Segarkan Data">
-                  <i class="bi bi-arrow-clockwise"></i>
+                <button class="btn btn-sm btn-light border" id="btnRefreshCustomList" onclick="refreshCustomListWithAnimation()" title="Segarkan Data Pesanan Custom">
+                  <i class="bi bi-arrow-clockwise" id="iconRefreshCustomList"></i>
                 </button>
               </div>
             </div>
@@ -1448,11 +1496,48 @@
       document.getElementById('planBtnSubmitSpinner').classList.add('d-none');
     }
 
-    // ── COUNTING (POS KASIR) LOGIC ─────────────────────────────
+    // ── COUNTING (POS KASIR) LOGIC & OPTIMIZED ACTIONS ────────
     var currentCountEvent = null;
     var currentCountHarga = 0;
     var countStokAwalPin  = 0;
     var countStokAwalGk   = 0;
+
+    // Local cached settings for instant 0ms calculation
+    var appSettings = {
+      harga_satuan: 4000,
+      harga_bundel: 10000,
+      min_bundel: 3,
+      stok_warning: 10
+    };
+
+    function triggerHaptic(duration) {
+      try {
+        if (navigator && navigator.vibrate) {
+          navigator.vibrate(duration || 15);
+        }
+      } catch(e) {}
+    }
+
+    function hitungHargaClient(qtyPin, qtyGk) {
+      qtyPin = Math.max(0, parseInt(qtyPin) || 0);
+      qtyGk  = Math.max(0, parseInt(qtyGk)  || 0);
+      var sat = Number(appSettings.harga_satuan) || 4000;
+      var bnd = Number(appSettings.harga_bundel) || 10000;
+      var min = Number(appSettings.min_bundel)   || 3;
+      var total = qtyPin + qtyGk;
+      var bndCount = Math.floor(total / min);
+      var sisaCount = total % min;
+      var totalHarga = (bndCount * bnd) + (sisaCount * sat);
+      return {
+        total_qty: total,
+        jumlah_bundel: bndCount,
+        sisa_qty: sisaCount,
+        total_harga: totalHarga,
+        harga_satuan: sat,
+        harga_bundel: bnd,
+        min_bundel: min
+      };
+    }
 
     function loadCountingEvents(autoSelectId) {
       google.script.run
@@ -1470,6 +1555,37 @@
         })
         .withFailureHandler(showError)
         .apiGetActiveEvents();
+    }
+
+    function refreshCountingData() {
+      var icon = document.getElementById('iconRefreshCounting');
+      if (icon) icon.classList.add('spin-animate');
+      triggerHaptic(20);
+
+      var eventId = document.getElementById('countEventSelector').value;
+      if (!eventId) {
+        loadCountingEvents();
+        setTimeout(function() { if (icon) icon.classList.remove('spin-animate'); }, 700);
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          if (icon) icon.classList.remove('spin-animate');
+          currentCountEvent = JSON.parse(json);
+          if (!currentCountEvent) return;
+          countStokAwalPin = currentCountEvent.stok_awal_pin;
+          countStokAwalGk  = currentCountEvent.stok_awal_gk;
+          updateCountingStokDisplay(currentCountEvent.stok_sisa_pin, currentCountEvent.stok_sisa_gk);
+          loadCountingRiwayat();
+          loadPesananCustomList();
+          showToast('Data stok & riwayat kasir diperbarui', 'info');
+        })
+        .withFailureHandler(function(err) {
+          if (icon) icon.classList.remove('spin-animate');
+          showError(err);
+        })
+        .apiGetEventById(eventId);
     }
 
     function onCountingEventChange() {
@@ -1513,7 +1629,7 @@
       if (sisaPin === 0) {
         document.getElementById('countCardPin').classList.add('border-danger');
         msgs.push('Stok PIN habis! Mohon restok atau hentikan penjualan Pin.');
-      } else if (sisaPin <= 10) {
+      } else if (sisaPin <= (appSettings.stok_warning || 10)) {
         document.getElementById('countCardPin').classList.add('border-warning');
         msgs.push('Perhatian: Stok PIN tersisa ' + sisaPin + ' pcs.');
       }
@@ -1521,7 +1637,7 @@
       if (sisaGk === 0) {
         document.getElementById('countCardGk').classList.add('border-danger');
         msgs.push('Stok GK habis! Mohon restok atau hentikan penjualan Gantungan Kunci.');
-      } else if (sisaGk <= 10) {
+      } else if (sisaGk <= (appSettings.stok_warning || 10)) {
         document.getElementById('countCardGk').classList.add('border-warning');
         msgs.push('Perhatian: Stok GK tersisa ' + sisaGk + ' pcs.');
       }
@@ -1536,60 +1652,143 @@
       }
     }
 
+    function applyQuickCombo(jenis, pin, gk) {
+      triggerHaptic(20);
+      if (jenis === 'pin') {
+        var rPin = document.getElementById('jPin');
+        if (rPin) rPin.checked = true;
+        document.getElementById('countColGk').classList.add('d-none');
+        document.getElementById('countColPin').classList.remove('d-none');
+        document.getElementById('countQtyPin').value = pin;
+        document.getElementById('countQtyGk').value = 0;
+      } else if (jenis === 'gk') {
+        var rGk = document.getElementById('jGk');
+        if (rGk) rGk.checked = true;
+        document.getElementById('countColPin').classList.add('d-none');
+        document.getElementById('countColGk').classList.remove('d-none');
+        document.getElementById('countQtyPin').value = 0;
+        document.getElementById('countQtyGk').value = gk;
+      } else {
+        var rCamp = document.getElementById('jCamp');
+        if (rCamp) rCamp.checked = true;
+        document.getElementById('countColPin').classList.remove('d-none');
+        document.getElementById('countColGk').classList.remove('d-none');
+        document.getElementById('countQtyPin').value = pin;
+        document.getElementById('countQtyGk').value = gk;
+      }
+      kalkulasiCounting();
+
+      if (currentCountEvent) {
+        if (pin > currentCountEvent.stok_sisa_pin) {
+          showToast('⚠️ Peringatan: Stok Pin tersisa ' + currentCountEvent.stok_sisa_pin + ' pcs', 'warning');
+        }
+        if (gk > currentCountEvent.stok_sisa_gk) {
+          showToast('⚠️ Peringatan: Stok GK tersisa ' + currentCountEvent.stok_sisa_gk + ' pcs', 'warning');
+        }
+      }
+    }
+
     function quickAdd(inputId, val) {
       var el = document.getElementById(inputId);
-      el.value = (parseInt(el.value) || 0) + val;
+      if (!el) return;
+      triggerHaptic(15);
+      var currentVal = parseInt(el.value) || 0;
+      var newVal = currentVal + val;
+      el.value = Math.max(0, newVal);
       kalkulasiCounting();
+
+      if (currentCountEvent) {
+        if (inputId === 'countQtyPin' && newVal > currentCountEvent.stok_sisa_pin) {
+          showToast('⚠️ Qty Pin melebihi sisa stok (' + currentCountEvent.stok_sisa_pin + ' pcs)', 'warning');
+        } else if (inputId === 'countQtyGk' && newVal > currentCountEvent.stok_sisa_gk) {
+          showToast('⚠️ Qty GK melebihi sisa stok (' + currentCountEvent.stok_sisa_gk + ' pcs)', 'warning');
+        }
+      }
     }
 
     function quickSet(inputId, val) {
       var el = document.getElementById(inputId);
-      el.value = val;
+      if (!el) return;
+      triggerHaptic(15);
+      el.value = Math.max(0, val);
       kalkulasiCounting();
     }
 
     function kalkulasiCounting() {
-      var jenis = document.querySelector('input[name="countJenisProduk"]:checked').value;
-      var qtyPin = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('countQtyPin').value) || 0);
-      var qtyGk  = (jenis === 'pin') ? 0 : (parseInt(document.getElementById('countQtyGk').value) || 0);
+      var jenisRadio = document.querySelector('input[name="countJenisProduk"]:checked');
+      var jenis = jenisRadio ? jenisRadio.value : 'pin';
+      var pinEl = document.getElementById('countQtyPin');
+      var gkEl  = document.getElementById('countQtyGk');
+
+      var qtyPin = (jenis === 'gk') ? 0 : Math.max(0, parseInt(pinEl.value) || 0);
+      var qtyGk  = (jenis === 'pin') ? 0 : Math.max(0, parseInt(gkEl.value) || 0);
       var total  = qtyPin + qtyGk;
+
+      var btnConfirm = document.getElementById('countBtnKonfirmasi');
+      var btnText    = document.getElementById('countBtnKonfText');
+      var priceBadge = document.getElementById('countBtnKonfPriceBadge');
+      var btnIcon    = document.getElementById('countBtnKonfIcon');
+
+      var btnMinusPin = document.getElementById('btnMinusPin');
+      var btnMinusGk  = document.getElementById('btnMinusGk');
+      if (btnMinusPin) btnMinusPin.disabled = (qtyPin <= 0);
+      if (btnMinusGk)  btnMinusGk.disabled  = (qtyGk <= 0);
 
       if (total <= 0) {
         document.getElementById('countPreviewQty').textContent   = '0 pcs';
         document.getElementById('countPreviewHarga').textContent = 'Rp 0';
         document.getElementById('countPreviewDetail').textContent = '';
-        document.getElementById('countBtnKonfirmasi').disabled   = true;
+        if (btnConfirm) {
+          btnConfirm.disabled = true;
+          btnConfirm.classList.remove('btn-pos-ready');
+        }
+        if (btnText) btnText.textContent = 'Pilih Produk Terlebih Dahulu';
+        if (priceBadge) { priceBadge.classList.add('d-none'); priceBadge.textContent = 'Rp 0'; }
+        if (btnIcon) btnIcon.className = 'bi bi-cart3 fs-4';
         currentCountHarga = 0;
         return;
       }
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          var r = JSON.parse(res);
-          if (r.status !== 'ok') return;
-          var d = r.data;
-          currentCountHarga = d.total_harga;
-          document.getElementById('countPreviewQty').textContent   = total + ' pcs';
-          document.getElementById('countPreviewHarga').textContent = formatRp(d.total_harga);
-          var detail = '';
-          if (d.jumlah_bundel > 0) detail += d.jumlah_bundel + ' Bundel (×Rp' + Number(d.harga_bundel).toLocaleString('id-ID') + ')';
-          if (d.sisa_qty > 0) detail += (detail ? ' + ' : '') + d.sisa_qty + ' Satuan (×Rp' + Number(d.harga_satuan).toLocaleString('id-ID') + ')';
-          document.getElementById('countPreviewDetail').textContent = detail;
-          document.getElementById('countBtnKonfirmasi').disabled = false;
-        })
-        .apiKalkulasiHarga(qtyPin, qtyGk);
+      // Fast Instant Local Calculation (0ms)
+      var d = hitungHargaClient(qtyPin, qtyGk);
+      currentCountHarga = d.total_harga;
+
+      document.getElementById('countPreviewQty').textContent   = total + ' pcs';
+      document.getElementById('countPreviewHarga').textContent = formatRp(d.total_harga);
+
+      var detail = '';
+      if (d.jumlah_bundel > 0) detail += d.jumlah_bundel + ' Bundel (×' + formatRp(d.harga_bundel) + ')';
+      if (d.sisa_qty > 0) detail += (detail ? ' + ' : '') + d.sisa_qty + ' Satuan (×' + formatRp(d.harga_satuan) + ')';
+      document.getElementById('countPreviewDetail').textContent = detail;
+
+      if (btnConfirm) {
+        btnConfirm.disabled = false;
+        btnConfirm.classList.add('btn-pos-ready');
+      }
+      if (btnText) btnText.textContent = 'Konfirmasi Bayar (' + total + ' pcs)';
+      if (priceBadge) {
+        priceBadge.textContent = formatRp(d.total_harga);
+        priceBadge.classList.remove('d-none');
+      }
+      if (btnIcon) btnIcon.className = 'bi bi-check2-circle fs-4';
     }
 
     function adjustCounting(id, delta) {
       var el = document.getElementById(id);
+      if (!el) return;
+      triggerHaptic(10);
       var val = (parseInt(el.value) || 0) + delta;
       el.value = Math.max(0, val);
       kalkulasiCounting();
     }
 
     function konfirmasiCounting() {
-      if (!currentCountEvent) return;
-      var jenis = document.querySelector('input[name="countJenisProduk"]:checked').value;
+      if (!currentCountEvent) {
+        showToast('Pilih event terlebih dahulu!', 'warning');
+        return;
+      }
+      var jenisRadio = document.querySelector('input[name="countJenisProduk"]:checked');
+      var jenis = jenisRadio ? jenisRadio.value : 'pin';
       var qtyPin = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('countQtyPin').value) || 0);
       var qtyGk  = (jenis === 'pin') ? 0 : (parseInt(document.getElementById('countQtyGk').value) || 0);
 
@@ -1600,58 +1799,121 @@
 
       if (qtyPin > currentCountEvent.stok_sisa_pin) {
         showToast('Stok Pin tidak cukup! Sisa ' + currentCountEvent.stok_sisa_pin + ' pcs', 'danger');
+        triggerHaptic(50);
         return;
       }
       if (qtyGk > currentCountEvent.stok_sisa_gk) {
         showToast('Stok GK tidak cukup! Sisa ' + currentCountEvent.stok_sisa_gk + ' pcs', 'danger');
+        triggerHaptic(50);
         return;
       }
 
       var btn = document.getElementById('countBtnKonfirmasi');
       var txt = document.getElementById('countBtnKonfText');
       var spn = document.getElementById('countBtnKonfSpinner');
-      btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+      var ico = document.getElementById('countBtnKonfIcon');
+      var badge = document.getElementById('countBtnKonfPriceBadge');
+
+      btn.disabled = true;
+      txt.textContent = 'Memproses Transaksi...';
+      if (ico) ico.classList.add('d-none');
+      if (spn) spn.classList.remove('d-none');
+      triggerHaptic(25);
+
+      var bayarFinal = currentCountHarga;
 
       google.script.run
         .withSuccessHandler(function(res) {
-          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          btn.disabled = false;
+          if (ico) ico.classList.remove('d-none');
+          if (spn) spn.classList.add('d-none');
+
           var r = JSON.parse(res);
           if (r.status === 'ok') {
             currentCountEvent.stok_sisa_pin = r.data.sisa_pin;
             currentCountEvent.stok_sisa_gk  = r.data.sisa_gk;
             updateCountingStokDisplay(r.data.sisa_pin, r.data.sisa_gk);
-            showToast('✅ Berhasil! ' + formatRp(currentCountHarga), 'success');
+            showToast('✅ Berhasil! Penjualan ' + formatRp(bayarFinal) + ' dicatat', 'success');
+            triggerHaptic(35);
             resetCountingForm();
             loadCountingRiwayat();
           } else {
-            showToast(r.message, 'danger');
+            showToast(r.message || 'Gagal menyimpan transaksi', 'danger');
+            kalkulasiCounting();
           }
         })
         .withFailureHandler(function(e) {
-          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          btn.disabled = false;
+          if (ico) ico.classList.remove('d-none');
+          if (spn) spn.classList.add('d-none');
           showToast('Error: ' + e.message, 'danger');
+          kalkulasiCounting();
         })
-        .apiCreateTransaksi(currentCountEvent.event_id, jenis, qtyPin, qtyGk, currentCountHarga, '');
+        .apiCreateTransaksi(currentCountEvent.event_id, jenis, qtyPin, qtyGk, bayarFinal, '');
+    }
+
+    var undoConfirmTimer = null;
+    function handleUndoClick() {
+      if (!currentCountEvent) return;
+      var btn = document.getElementById('countBtnUndo');
+      var txt = document.getElementById('countBtnUndoText');
+      var spn = document.getElementById('countBtnUndoSpinner');
+      var ico = document.getElementById('countBtnUndoIcon');
+
+      if (btn.dataset.confirmState === 'pending') {
+        clearTimeout(undoConfirmTimer);
+        btn.dataset.confirmState = 'idle';
+        btn.classList.remove('btn-danger', 'text-white');
+        btn.classList.add('btn-light', 'text-danger');
+        btn.disabled = true;
+        if (ico) ico.classList.add('d-none');
+        if (spn) spn.classList.remove('d-none');
+        txt.textContent = 'Membatalkan transaksi...';
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            btn.disabled = false;
+            if (ico) ico.classList.remove('d-none');
+            if (spn) spn.classList.add('d-none');
+            txt.textContent = 'Batalkan Transaksi Terakhir (Undo)';
+            var r = JSON.parse(res);
+            if (r.status === 'ok') {
+              currentCountEvent.stok_sisa_pin = r.data.sisa_pin;
+              currentCountEvent.stok_sisa_gk  = r.data.sisa_gk;
+              updateCountingStokDisplay(r.data.sisa_pin, r.data.sisa_gk);
+              showToast('↩️ Transaksi terakhir berhasil dibatalkan', 'info');
+              triggerHaptic(30);
+              loadCountingRiwayat();
+            } else {
+              showToast(r.message || 'Gagal membatalkan transaksi', 'danger');
+            }
+          })
+          .withFailureHandler(function(err) {
+            btn.disabled = false;
+            if (ico) ico.classList.remove('d-none');
+            if (spn) spn.classList.add('d-none');
+            txt.textContent = 'Batalkan Transaksi Terakhir (Undo)';
+            showError(err);
+          })
+          .apiDeleteLastTransaksi(currentCountEvent.event_id);
+      } else {
+        triggerHaptic(25);
+        btn.dataset.confirmState = 'pending';
+        btn.classList.remove('btn-light', 'text-danger');
+        btn.classList.add('btn-danger', 'text-white');
+        txt.innerHTML = '<strong>⚠️ Klik sekali lagi untuk batal!</strong> (3s)';
+
+        undoConfirmTimer = setTimeout(function() {
+          btn.dataset.confirmState = 'idle';
+          btn.classList.remove('btn-danger', 'text-white');
+          btn.classList.add('btn-light', 'text-danger');
+          txt.textContent = 'Batalkan Transaksi Terakhir (Undo)';
+        }, 3500);
+      }
     }
 
     function undoCountingTransaksi() {
-      if (!currentCountEvent) return;
-      if (!confirm('Batalkan transaksi terakhir pada event ini? Stok produk akan dikembalikan.')) return;
-      google.script.run
-        .withSuccessHandler(function(res) {
-          var r = JSON.parse(res);
-          if (r.status === 'ok') {
-            currentCountEvent.stok_sisa_pin = r.data.sisa_pin;
-            currentCountEvent.stok_sisa_gk  = r.data.sisa_gk;
-            updateCountingStokDisplay(r.data.sisa_pin, r.data.sisa_gk);
-            showToast('↩️ Transaksi terakhir dibatalkan', 'info');
-            loadCountingRiwayat();
-          } else {
-            showToast(r.message, 'danger');
-          }
-        })
-        .withFailureHandler(showError)
-        .apiDeleteLastTransaksi(currentCountEvent.event_id);
+      handleUndoClick();
     }
 
     function loadCountingRiwayat() {
@@ -1667,6 +1929,11 @@
           var totalHar  = list.reduce(function(s,t){ return s + (t.total_harga || 0); }, 0);
 
           document.getElementById('countTodayTotal').textContent = list.length + ' transaksi · ' + formatRp(totalHar);
+
+          var btnUndo = document.getElementById('countBtnUndo');
+          if (btnUndo) {
+            btnUndo.disabled = (list.length === 0);
+          }
 
           if (list.length === 0) {
             container.innerHTML = '';
@@ -1699,18 +1966,16 @@
     function resetCountingForm() {
       document.getElementById('countQtyPin').value = 0;
       document.getElementById('countQtyGk').value  = 0;
-      document.getElementById('jPin').checked = true;
+      var rPin = document.getElementById('jPin');
+      if (rPin) rPin.checked = true;
       document.getElementById('countColPin').classList.remove('d-none');
       document.getElementById('countColGk').classList.add('d-none');
-      document.getElementById('countPreviewQty').textContent   = '0 pcs';
-      document.getElementById('countPreviewHarga').textContent = 'Rp 0';
-      document.getElementById('countPreviewDetail').textContent = '';
-      document.getElementById('countBtnKonfirmasi').disabled   = true;
-      currentCountHarga = 0;
+      kalkulasiCounting();
     }
 
     // ── PESANAN CUSTOM (DESAIN BERBEDA) LOGIC ───────────────────
     function switchCountingTab(tab) {
+      triggerHaptic(15);
       var tabRegBtn = document.getElementById('tabBtnReguler');
       var tabCusBtn = document.getElementById('tabBtnCustom');
       var secReg    = document.getElementById('countSectionReguler');
@@ -1731,6 +1996,7 @@
     }
 
     function toggleCustomProdukInputs() {
+      triggerHaptic(10);
       var checkedRadio = document.querySelector('input[name="customJenisProduk"]:checked');
       var jenis = checkedRadio ? checkedRadio.value : 'pin';
       var colPin = document.getElementById('customColPin');
@@ -1759,13 +2025,33 @@
 
     function adjustCustomQty(id, delta) {
       var el = document.getElementById(id);
+      if (!el) return;
+      triggerHaptic(10);
       var val = (parseInt(el.value) || 0) + delta;
       el.value = Math.max(0, val);
+
+      var mPin = document.getElementById('btnMinusCustomPin');
+      var mGk  = document.getElementById('btnMinusCustomGk');
+      if (mPin && id === 'customQtyPin') mPin.disabled = (parseInt(el.value) <= 0);
+      if (mGk  && id === 'customQtyGk')  mGk.disabled  = (parseInt(el.value) <= 0);
+
       kalkulasiCustomTotal();
     }
 
     function quickAddCustom(id, delta) {
       adjustCustomQty(id, delta);
+    }
+
+    function quickSetCustom(id, val) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      triggerHaptic(15);
+      el.value = Math.max(0, val);
+      var mPin = document.getElementById('btnMinusCustomPin');
+      var mGk  = document.getElementById('btnMinusCustomGk');
+      if (mPin && id === 'customQtyPin') mPin.disabled = (parseInt(el.value) <= 0);
+      if (mGk  && id === 'customQtyGk')  mGk.disabled  = (parseInt(el.value) <= 0);
+      kalkulasiCustomTotal();
     }
 
     function kalkulasiCustomTotal() {
@@ -1789,6 +2075,7 @@
     }
 
     function hitungAutoHargaCustom() {
+      triggerHaptic(10);
       var checkedRadio = document.querySelector('input[name="customJenisProduk"]:checked');
       var jenis = checkedRadio ? checkedRadio.value : 'pin';
       var qtyPin = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('customQtyPin').value) || 0);
@@ -1799,19 +2086,21 @@
         return;
       }
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          try {
-            var r = (typeof res === 'string') ? JSON.parse(res) : res;
-            if (r && r.status === 'ok' && r.data) {
-              document.getElementById('customTotalHarga').value = r.data.total_harga;
-              if (document.getElementById('customStatusBayar').value === 'DP') {
-                document.getElementById('customNominalDp').value = Math.round(r.data.total_harga / 2);
-              }
-            }
-          } catch(e) {}
-        })
-        .apiKalkulasiHarga(qtyPin, qtyGk);
+      var d = hitungHargaClient(qtyPin, qtyGk);
+      document.getElementById('customTotalHarga').value = d.total_harga;
+      if (document.getElementById('customStatusBayar').value === 'DP') {
+        document.getElementById('customNominalDp').value = Math.round(d.total_harga / 2);
+      }
+    }
+
+    function refreshCustomListWithAnimation() {
+      var icon = document.getElementById('iconRefreshCustomList');
+      if (icon) icon.classList.add('spin-animate');
+      triggerHaptic(15);
+      loadPesananCustomList();
+      setTimeout(function() {
+        if (icon) icon.classList.remove('spin-animate');
+      }, 700);
     }
 
     function simpanPesananCustom(e) {
@@ -2353,10 +2642,15 @@
       google.script.run
         .withSuccessHandler(function(json) {
           var s = JSON.parse(json);
-          document.getElementById('setHargaSatuan').value = s.harga_satuan || 4000;
-          document.getElementById('setMinBundel').value   = s.min_bundel || 3;
-          document.getElementById('setHargaBundel').value = s.harga_bundel || 10000;
-          document.getElementById('setStokWarning').value = s.stok_warning || 10;
+          appSettings.harga_satuan = Number(s.harga_satuan) || 4000;
+          appSettings.min_bundel   = Number(s.min_bundel) || 3;
+          appSettings.harga_bundel = Number(s.harga_bundel) || 10000;
+          appSettings.stok_warning = Number(s.stok_warning) || 10;
+
+          document.getElementById('setHargaSatuan').value = appSettings.harga_satuan;
+          document.getElementById('setMinBundel').value   = appSettings.min_bundel;
+          document.getElementById('setHargaBundel').value = appSettings.harga_bundel;
+          document.getElementById('setStokWarning').value = appSettings.stok_warning;
           updateSettingsPreview();
         })
         .withFailureHandler(showError)
@@ -2383,6 +2677,10 @@
       var sat = document.getElementById('setHargaSatuan').value;
       var bnd = document.getElementById('setHargaBundel').value;
       var min = document.getElementById('setMinBundel').value;
+      appSettings.harga_satuan = Number(sat) || 4000;
+      appSettings.harga_bundel = Number(bnd) || 10000;
+      appSettings.min_bundel   = Number(min) || 3;
+
       google.script.run.withSuccessHandler(function(){ showToast('Harga satuan berhasil disimpan', 'success'); }).apiUpdateSetting('harga_satuan', sat);
       google.script.run.withSuccessHandler(function(){ showToast('Harga bundel berhasil disimpan', 'success'); }).apiUpdateSetting('harga_bundel', bnd);
       google.script.run.withSuccessHandler(function(){ showToast('Minimum bundel berhasil disimpan', 'success'); }).apiUpdateSetting('min_bundel', min);
@@ -2390,6 +2688,7 @@
 
     function simpanSettingsWarning() {
       var val = document.getElementById('setStokWarning').value;
+      appSettings.stok_warning = Number(val) || 10;
       google.script.run
         .withSuccessHandler(function(){ showToast('Ambang batas stok disimpan', 'success'); })
         .apiUpdateSetting('stok_warning', val);
@@ -2411,10 +2710,78 @@
         .apiSetupDatabase();
     }
 
+    // ── HOLD-TO-REPEAT & KEYBOARD SHORTCUTS ────────────────────
+    function initCountingHoldButtons() {
+      function attachHold(btnId, actionFn) {
+        var btn = document.getElementById(btnId);
+        if (!btn) return;
+        var timer = null;
+        var interval = null;
+        var didHold = false;
+
+        function startHold(e) {
+          if (e.button !== undefined && e.button !== 0) return;
+          didHold = false;
+          timer = setTimeout(function() {
+            didHold = true;
+            interval = setInterval(function() {
+              actionFn();
+            }, 110);
+          }, 350);
+        }
+
+        function stopHold() {
+          clearTimeout(timer);
+          clearInterval(interval);
+        }
+
+        btn.addEventListener('mousedown', startHold);
+        btn.addEventListener('touchstart', startHold, { passive: true });
+        btn.addEventListener('mouseup', stopHold);
+        btn.addEventListener('touchend', stopHold);
+        btn.addEventListener('mouseleave', stopHold);
+        btn.addEventListener('touchcancel', stopHold);
+
+        btn.addEventListener('click', function(e) {
+          if (didHold) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            didHold = false;
+          }
+        });
+      }
+
+      attachHold('btnPlusPin', function() { adjustCounting('countQtyPin', 1); });
+      attachHold('btnMinusPin', function() { adjustCounting('countQtyPin', -1); });
+      attachHold('btnPlusGk', function() { adjustCounting('countQtyGk', 1); });
+      attachHold('btnMinusGk', function() { adjustCounting('countQtyGk', -1); });
+      attachHold('btnPlusCustomPin', function() { adjustCustomQty('customQtyPin', 1); });
+      attachHold('btnMinusCustomPin', function() { adjustCustomQty('customQtyPin', -1); });
+      attachHold('btnPlusCustomGk', function() { adjustCustomQty('customQtyGk', 1); });
+      attachHold('btnMinusCustomGk', function() { adjustCustomQty('customQtyGk', -1); });
+    }
+
     // ── INITIALIZATION ─────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
+      // Background preload settings
+      google.script.run
+        .withSuccessHandler(function(json) {
+          try {
+            var s = JSON.parse(json);
+            if (s) {
+              appSettings.harga_satuan = Number(s.harga_satuan) || 4000;
+              appSettings.min_bundel   = Number(s.min_bundel)   || 3;
+              appSettings.harga_bundel = Number(s.harga_bundel) || 10000;
+              appSettings.stok_warning = Number(s.stok_warning) || 10;
+            }
+          } catch(e) {}
+        })
+        .apiGetAllSettings();
+
+      // Product switcher listener
       document.querySelectorAll('input[name="countJenisProduk"]').forEach(function(r) {
         r.addEventListener('change', function() {
+          triggerHaptic(15);
           var val = this.value;
           if (val === 'pin') {
             document.getElementById('countColGk').classList.add('d-none');
@@ -2431,6 +2798,36 @@
           kalkulasiCounting();
         });
       });
+
+      // Quick Cashier Keyboard Shortcuts
+      document.addEventListener('keydown', function(e) {
+        var countingView = document.getElementById('view-counting');
+        if (!countingView || countingView.classList.contains('d-none')) return;
+
+        var tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        var isInputText = (tag === 'input' && (document.activeElement.type === 'text' || document.activeElement.type === 'tel')) || tag === 'textarea';
+        if (isInputText) return;
+
+        if (e.key === 'Enter') {
+          var secReg = document.getElementById('countSectionReguler');
+          if (secReg && !secReg.classList.contains('d-none')) {
+            var btn = document.getElementById('countBtnKonfirmasi');
+            if (btn && !btn.disabled) {
+              e.preventDefault();
+              konfirmasiCounting();
+            }
+          }
+        } else if (e.key === 'Escape') {
+          var secReg = document.getElementById('countSectionReguler');
+          if (secReg && !secReg.classList.contains('d-none')) {
+            e.preventDefault();
+            resetCountingForm();
+            showToast('Form kasir di-reset', 'info');
+          }
+        }
+      });
+
+      initCountingHoldButtons();
 
       ['setHargaSatuan', 'setHargaBundel', 'setMinBundel'].forEach(function(id) {
         var el = document.getElementById(id);
