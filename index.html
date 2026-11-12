@@ -1,0 +1,2454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PinTrack — POS & Event Sales Manager</title>
+  <?!= include('styles'); ?>
+</head>
+<body>
+  <?!= include('navbar'); ?>
+
+  <!-- ========================================== -->
+  <!-- VIEW 1: DASHBOARD                          -->
+  <!-- ========================================== -->
+  <div id="view-dashboard" class="spa-view">
+    <div class="container py-4">
+      <!-- Header -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+          <h3 class="fw-bold mb-1 d-flex align-items-center gap-2">
+            <span>📊 Dashboard Event</span>
+          </h3>
+          <p class="text-muted small mb-0">Pantau performa penjualan, ketersediaan stok, dan rekap omzet.</p>
+        </div>
+        <button class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold" onclick="navigateTo('planning')">
+          <i class="bi bi-plus-circle-fill"></i>
+          <span>Rencanakan Event</span>
+        </button>
+      </div>
+
+      <!-- Bento Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-calendar-check-fill"></i>
+              </div>
+              <div class="stat-value font-mono-num" id="dashTotalEvent">0</div>
+              <div class="stat-label">Total Event Terdaftar</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+                <i class="bi bi-broadcast-pin"></i>
+              </div>
+              <div class="stat-value font-mono-num" id="dashEventAktif">0</div>
+              <div class="stat-label">Event Sedang Berjalan</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat-card stat-pin h-100">
+            <div class="card-body">
+              <div class="stat-icon-wrapper" style="background:#fef3c7; color:#d97706;">
+                <i class="bi bi-pin-angle-fill"></i>
+              </div>
+              <div class="stat-value font-mono-num" id="dashTotalPin">0</div>
+              <div class="stat-label">Sisa Total Pin (pcs)</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat-card stat-gk h-100">
+            <div class="card-body">
+              <div class="stat-icon-wrapper" style="background:#cffafe; color:#0891b2;">
+                <i class="bi bi-key-fill"></i>
+              </div>
+              <div class="stat-value font-mono-num" id="dashTotalGk">0</div>
+              <div class="stat-label">Sisa Total GK (pcs)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daftar Event Table Card -->
+      <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+            <i class="bi bi-list-task text-primary"></i> Daftar Seluruh Event
+          </h6>
+          <button class="btn btn-sm btn-light border" onclick="loadDashboard()">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <div id="dashLoadingEvents" class="text-center py-5 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+            <span>Memuat data event...</span>
+          </div>
+
+          <div id="dashEventListContainer" class="d-none">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Nama Event</th>
+                    <th>Jadwal</th>
+                    <th>Lokasi</th>
+                    <th class="text-center">Stok Pin</th>
+                    <th class="text-center">Stok GK</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Aksi Cepat</th>
+                  </tr>
+                </thead>
+                <tbody id="dashEventTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="dashEmptyEvents" class="d-none text-center py-5 text-muted">
+            <i class="bi bi-calendar-x fs-1 text-secondary opacity-50"></i>
+            <h6 class="mt-3 fw-bold">Belum Ada Event Terdaftar</h6>
+            <p class="small text-muted mb-3">Mulai buat perencanaan event dan tentukan alokasi stok produk.</p>
+            <button class="btn btn-outline-primary btn-sm" onclick="navigateTo('planning')">
+              + Buat Event Pertama
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VIEW 2: PLANNING                           -->
+  <!-- ========================================== -->
+  <div id="view-planning" class="spa-view d-none">
+    <div class="container py-4">
+      <div class="mb-4">
+        <h3 class="fw-bold mb-1">📋 Perencanaan Event</h3>
+        <p class="text-muted small mb-0">Tentukan jadwal, lokasi, dan alokasi stok produk Pin serta Gantungan Kunci.</p>
+      </div>
+
+      <!-- Form Buat / Edit Event -->
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2 text-primary" id="planFormTitle">
+            <i class="bi bi-calendar-plus-fill"></i> Buat Event Baru
+          </h6>
+        </div>
+        <div class="card-body">
+          <form id="planForm" onsubmit="submitPlanEvent(event)">
+            <input type="hidden" id="planEditEventId">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small text-muted">Nama Event <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag-fill"></i></span>
+                  <input type="text" class="form-control" id="planNamaEvent" placeholder="cth: Anime Expo 2026" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small text-muted">Lokasi Event <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
+                  <input type="text" class="form-control" id="planLokasiEvent" placeholder="cth: Booth A12, GBK Senayan" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small text-muted">Tanggal Mulai <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-calendar-range"></i></span>
+                  <input type="date" class="form-control" id="planTglMulai" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small text-muted">Tanggal Selesai <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-calendar-range-fill"></i></span>
+                  <input type="date" class="form-control" id="planTglSelesai" required>
+                </div>
+              </div>
+
+              <!-- Alokasi Stok -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small" style="color:#b45309;">
+                  <i class="bi bi-pin-angle-fill me-1"></i> Stok Awal PIN <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control font-mono-num fw-bold fs-5" id="planStokPin" min="0" placeholder="0" required>
+                  <span class="input-group-text fw-semibold">pcs</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small" style="color:#0e7490;">
+                  <i class="bi bi-key-fill me-1"></i> Stok Awal Gantungan Kunci <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control font-mono-num fw-bold fs-5" id="planStokGk" min="0" placeholder="0" required>
+                  <span class="input-group-text fw-semibold">pcs</span>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-semibold small text-muted">Catatan Tambahan (Opsional)</label>
+                <textarea class="form-control" id="planCatatanEvent" rows="2" placeholder="Catatan shift, perlengkapan booth, dsb."></textarea>
+              </div>
+
+              <!-- Modal Per Produk -->
+              <div class="col-12">
+                <hr class="my-1">
+                <label class="form-label fw-bold small text-muted mt-2">💰 Harga Modal per Pcs (Untuk Perhitungan Untung Bersih)</label>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small" style="color:#b45309;">
+                  <i class="bi bi-pin-angle-fill me-1"></i> Modal per Pcs PIN
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">Rp</span>
+                  <input type="number" class="form-control font-mono-num fw-bold" id="planModalPin" min="0" placeholder="0" value="0">
+                  <span class="input-group-text fw-semibold">/ pcs</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small" style="color:#0e7490;">
+                  <i class="bi bi-key-fill me-1"></i> Modal per Pcs GK
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">Rp</span>
+                  <input type="number" class="form-control font-mono-num fw-bold" id="planModalGk" min="0" placeholder="0" value="0">
+                  <span class="input-group-text fw-semibold">/ pcs</span>
+                </div>
+              </div>
+
+              <!-- Daftar Peserta Jualan -->
+              <div class="col-12">
+                <hr class="my-1">
+                <label class="form-label fw-bold small text-muted mt-2">👥 Daftar Nama yang Ikut Berjualan</label>
+                <div class="d-flex gap-2 mb-2">
+                  <input type="text" class="form-control" id="planPesertaInput" placeholder="Ketik nama (cth: Budi), lalu tekan Enter atau klik Tambah">
+                  <button type="button" class="btn btn-outline-primary fw-semibold px-3" onclick="tambahPeserta()">
+                    <i class="bi bi-person-plus-fill me-1"></i> Tambah
+                  </button>
+                </div>
+                <div id="planPesertaTags" class="d-flex flex-wrap gap-2 mb-1 p-2 bg-light rounded border min-h-tag">
+                  <span class="text-muted small">Belum ada nama peserta ditambahkan.</span>
+                </div>
+                <input type="hidden" id="planPeserta">
+                <small class="text-muted">Hasil keuntungan bersih akan dibagi rata sesuai jumlah orang yang ikut berjualan.</small>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button type="submit" class="btn btn-primary px-4 fw-bold" id="planBtnSubmit">
+                <span id="planBtnSubmitText"><i class="bi bi-check2-circle me-1"></i> Simpan Event</span>
+                <span id="planBtnSubmitSpinner" class="spinner-border spinner-border-sm d-none"></span>
+              </button>
+              <button type="button" class="btn btn-outline-secondary px-3" onclick="resetPlanForm()">Batal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Daftar Event Terencana -->
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+            <i class="bi bi-collection-fill text-primary"></i> Daftar Event Terdaftar
+          </h6>
+          <button class="btn btn-sm btn-light border" onclick="loadPlanningList()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <div id="planLoadingEvents" class="text-center py-4 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+            <span>Memuat data...</span>
+          </div>
+          <div id="planEventCards" class="p-3 d-none"></div>
+          <div id="planEmptyEvents" class="d-none text-center py-5 text-muted">
+            <i class="bi bi-clipboard-x fs-1 opacity-50"></i>
+            <p class="mt-2 small">Belum ada data event tersimpan.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VIEW 3: COUNTING (POS KASIR HERO)          -->
+  <!-- ========================================== -->
+  <div id="view-counting" class="spa-view d-none">
+    <div class="container py-4">
+      <!-- Selector Event Aktif -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-3">
+          <div class="row align-items-center g-2">
+            <div class="col-auto">
+              <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary mb-0" style="width:38px;height:38px;">
+                <i class="bi bi-shop"></i>
+              </div>
+            </div>
+            <div class="col">
+              <label class="form-label fw-bold small text-muted mb-0">Pilih Event yang Sedang Berjalan</label>
+              <select class="form-select fw-bold border-0 bg-light shadow-none" id="countEventSelector" onchange="onCountingEventChange()">
+                <option value="">— Ketuk untuk memilih event aktif —</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Panel Kasir -->
+      <div id="countMainPanel" class="d-none">
+
+        <!-- Segmented Tab Navigation: Reguler vs Pesanan Custom -->
+        <div class="counting-tabs-nav mb-3">
+          <button type="button" class="counting-tab-btn active tab-reguler-active" id="tabBtnReguler" onclick="switchCountingTab('reguler')">
+            <i class="bi bi-box-seam-fill"></i> Transaksi Reguler (Ready Stock)
+          </button>
+          <button type="button" class="counting-tab-btn" id="tabBtnCustom" onclick="switchCountingTab('custom')">
+            <i class="bi bi-palette-fill"></i> Pesanan Custom (Desain Berbeda)
+            <span class="badge bg-warning text-dark ms-1 font-mono-num" id="badgeCustomCount" style="display:none;">0</span>
+          </button>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- SECTION 1: TRANSAKSI REGULER (READY STOCK)      -->
+        <!-- ============================================== -->
+        <div id="countSectionReguler">
+
+          <!-- Live Stock Bento Cards -->
+          <div class="row g-3 mb-3">
+            <!-- Pin Card -->
+            <div class="col-6">
+              <div class="card stok-hero-card pin-theme text-center p-3" id="countCardPin">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="badge" style="background:#fef3c7; color:#b45309;">
+                    <i class="bi bi-pin-angle-fill"></i> PIN
+                  </span>
+                  <small class="text-muted fw-semibold">Sisa Stok</small>
+                </div>
+                <div class="display-5 fw-extrabold font-mono-num my-1" id="countSisaPin" style="color:#d97706;">—</div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar bg-warning" id="countProgressPin" style="width:100%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GK Card -->
+            <div class="col-6">
+              <div class="card stok-hero-card gk-theme text-center p-3" id="countCardGk">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="badge" style="background:#cffafe; color:#0e7490;">
+                    <i class="bi bi-key-fill"></i> GK
+                  </span>
+                  <small class="text-muted fw-semibold">Sisa Stok</small>
+                </div>
+                <div class="display-5 fw-extrabold font-mono-num my-1" id="countSisaGk" style="color:#0891b2;">—</div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar bg-info" id="countProgressGk" style="width:100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Stok Menipis -->
+          <div id="countAlertStok" class="d-none mb-3"></div>
+
+          <!-- POS Checkout Card -->
+          <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-calculator-fill text-primary"></i> Input Pembelian
+              </span>
+              <span class="badge bg-light text-dark border">1 pcs = Rp4k | 3 pcs = Rp10k</span>
+            </div>
+            <div class="card-body">
+
+              <!-- Toggle Jenis Produk -->
+              <div class="mb-3">
+                <div class="btn-group w-100" role="group">
+                  <input type="radio" class="btn-check" name="countJenisProduk" id="jPin" value="pin" checked>
+                  <label class="btn btn-outline-warning fw-bold py-2" for="jPin">
+                    <i class="bi bi-pin-angle-fill"></i> Pin Saja
+                  </label>
+
+                  <input type="radio" class="btn-check" name="countJenisProduk" id="jGk" value="gk">
+                  <label class="btn btn-outline-info fw-bold py-2" for="jGk">
+                    <i class="bi bi-key-fill"></i> GK Saja
+                  </label>
+
+                  <input type="radio" class="btn-check" name="countJenisProduk" id="jCamp" value="campuran">
+                  <label class="btn btn-outline-primary fw-bold py-2" for="jCamp">
+                    <i class="bi bi-bag-plus-fill"></i> Campuran
+                  </label>
+                </div>
+              </div>
+
+              <!-- Stepper Counters & Preset Buttons -->
+              <div class="row g-3 mb-3">
+                <!-- Stepper Pin -->
+                <div class="col-12 col-md-6" id="countColPin">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="fw-bold small" style="color:#b45309;">
+                      <i class="bi bi-pin-angle-fill me-1"></i> Jumlah Pin
+                    </label>
+                    <!-- Fast Preset Buttons -->
+                    <div class="d-flex gap-1">
+                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 1)">+1</button>
+                      <button type="button" class="preset-chip pin-chip" onclick="quickAdd('countQtyPin', 3)">+3 (Bundel)</button>
+                      <button type="button" class="preset-chip" onclick="quickSet('countQtyPin', 0)">Reset</button>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyPin', -1)">
+                      <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <input type="number" class="form-control text-center stepper-input font-mono-num" id="countQtyPin" value="0" min="0" oninput="kalkulasiCounting()">
+                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyPin', 1)">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Stepper GK -->
+                <div class="col-12 col-md-6 d-none" id="countColGk">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="fw-bold small" style="color:#0e7490;">
+                      <i class="bi bi-key-fill me-1"></i> Jumlah GK
+                    </label>
+                    <!-- Fast Preset Buttons -->
+                    <div class="d-flex gap-1">
+                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 1)">+1</button>
+                      <button type="button" class="preset-chip gk-chip" onclick="quickAdd('countQtyGk', 3)">+3 (Bundel)</button>
+                      <button type="button" class="preset-chip" onclick="quickSet('countQtyGk', 0)">Reset</button>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyGk', -1)">
+                      <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <input type="number" class="form-control text-center stepper-input font-mono-num" id="countQtyGk" value="0" min="0" oninput="kalkulasiCounting()">
+                    <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCounting('countQtyGk', 1)">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Receipt & Total Display -->
+              <div class="pos-receipt-box mb-3">
+                <div class="d-flex justify-content-between align-items-end">
+                  <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Total Item</span>
+                    <div class="fs-4 fw-bold font-mono-num text-dark" id="countPreviewQty">0 pcs</div>
+                    <div class="small fw-semibold text-primary mt-1" id="countPreviewDetail"></div>
+                  </div>
+                  <div class="text-end">
+                    <span class="text-muted small fw-semibold text-uppercase">Total Tagihan</span>
+                    <div class="display-6 fw-extrabold font-mono-num text-success" id="countPreviewHarga">Rp 0</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Big Confirmation Button -->
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-pos-confirm" id="countBtnKonfirmasi" onclick="konfirmasiCounting()" disabled>
+                  <span id="countBtnKonfText"><i class="bi bi-check2-circle me-2"></i> Konfirmasi Transaksi</span>
+                  <span id="countBtnKonfSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                </button>
+                <button class="btn btn-light text-danger border btn-sm py-2" onclick="undoCountingTransaksi()">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i> Batalkan Transaksi Terakhir (Undo)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Riwayat Transaksi Hari Ini -->
+          <div class="card shadow-sm border-0">
+            <div class="card-header d-flex justify-content-between align-items-center py-3">
+              <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-clock-history text-secondary"></i> Transaksi Hari Ini
+              </h6>
+              <span class="badge bg-success bg-opacity-10 text-success font-mono-num" id="countTodayTotal">0 transaksi</span>
+            </div>
+            <div class="card-body p-0">
+              <div id="countLoadingRiwayat" class="text-center py-4 text-muted d-none">
+                <div class="spinner-border spinner-border-sm text-secondary"></div>
+              </div>
+              <div id="countRiwayatList" class="list-group list-group-flush"></div>
+              <div id="countEmptyRiwayat" class="text-center py-4 text-muted small">
+                Belum ada transaksi di event ini.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- SECTION 2: PESANAN CUSTOM (DESAIN BERBEDA)     -->
+        <!-- ============================================== -->
+        <div id="countSectionCustom" class="d-none">
+
+          <!-- Info Banner -->
+          <div class="alert alert-warning py-2 px-3 mb-3 d-flex align-items-center gap-2 small">
+            <i class="bi bi-info-circle-fill fs-5 text-warning"></i>
+            <div>
+              <strong>Mode Pesanan Custom:</strong> Digunakan untuk mencatat pesanan made-to-order (custom foto, logo, anime, dll). 
+              <span class="text-muted">Pesanan ini <u>tidak mengurangi stok ready booth</u> karena diproduksi khusus.</span>
+            </div>
+          </div>
+
+          <!-- Form Pesanan Custom Card -->
+          <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-palette-fill text-warning"></i> Form Catat Pesanan Custom
+              </h6>
+              <span class="badge bg-warning bg-opacity-10 text-dark border border-warning">Made-to-Order</span>
+            </div>
+            <div class="card-body">
+              <form id="formPesananCustom" onsubmit="simpanPesananCustom(event)">
+                <div class="row g-3">
+                  <!-- Nama Customer -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1">Nama Customer <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                      <input type="text" class="form-control" id="customNamaCust" placeholder="Nama pemesan..." required>
+                    </div>
+                  </div>
+
+                  <!-- Kontak Customer (WhatsApp) -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1">No. WhatsApp / HP <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-whatsapp text-success"></i></span>
+                      <input type="tel" class="form-control" id="customKontakCust" placeholder="08xxxxxxxxxx" required>
+                    </div>
+                  </div>
+
+                  <!-- Toggle Jenis Produk Custom -->
+                  <div class="col-12">
+                    <label class="form-label fw-bold small text-muted mb-1">Jenis Produk Dipesan <span class="text-danger">*</span></label>
+                    <div class="btn-group w-100" role="group">
+                      <input type="radio" class="btn-check" name="customJenisProduk" id="cPin" value="pin" checked onchange="toggleCustomProdukInputs()">
+                      <label class="btn btn-outline-warning fw-bold py-2" for="cPin">
+                        <i class="bi bi-pin-angle-fill"></i> Pin Saja
+                      </label>
+
+                      <input type="radio" class="btn-check" name="customJenisProduk" id="cGk" value="gk" onchange="toggleCustomProdukInputs()">
+                      <label class="btn btn-outline-info fw-bold py-2" for="cGk">
+                        <i class="bi bi-key-fill"></i> GK Saja
+                      </label>
+
+                      <input type="radio" class="btn-check" name="customJenisProduk" id="cCamp" value="campuran" onchange="toggleCustomProdukInputs()">
+                      <label class="btn btn-outline-primary fw-bold py-2" for="cCamp">
+                        <i class="bi bi-bag-plus-fill"></i> Campuran
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Stepper Qty Pin -->
+                  <div class="col-12 col-md-6" id="customColPin">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold small" style="color:#b45309;">
+                        <i class="bi bi-pin-angle-fill me-1"></i> Qty Pin (pcs)
+                      </label>
+                      <div class="d-flex gap-1">
+                        <button type="button" class="preset-chip pin-chip" onclick="quickAddCustom('customQtyPin', 1)">+1</button>
+                        <button type="button" class="preset-chip pin-chip" onclick="quickAddCustom('customQtyPin', 3)">+3</button>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyPin', -1)"><i class="bi bi-dash-lg"></i></button>
+                      <input type="number" class="form-control text-center font-mono-num fw-bold stepper-input" id="customQtyPin" value="1" min="0" oninput="kalkulasiCustomTotal()">
+                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyPin', 1)"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                  </div>
+
+                  <!-- Stepper Qty GK -->
+                  <div class="col-12 col-md-6 d-none" id="customColGk">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold small" style="color:#0e7490;">
+                        <i class="bi bi-key-fill me-1"></i> Qty GK (pcs)
+                      </label>
+                      <div class="d-flex gap-1">
+                        <button type="button" class="preset-chip gk-chip" onclick="quickAddCustom('customQtyGk', 1)">+1</button>
+                        <button type="button" class="preset-chip gk-chip" onclick="quickAddCustom('customQtyGk', 3)">+3</button>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyGk', -1)"><i class="bi bi-dash-lg"></i></button>
+                      <input type="number" class="form-control text-center font-mono-num fw-bold stepper-input" id="customQtyGk" value="0" min="0" oninput="kalkulasiCustomTotal()">
+                      <button type="button" class="btn btn-light border stepper-btn" onclick="adjustCustomQty('customQtyGk', 1)"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                  </div>
+
+                  <!-- Deskripsi Desain -->
+                  <div class="col-12">
+                    <label class="form-label fw-bold small text-muted mb-1">Deskripsi / Detail Desain <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="customDeskripsiDesain" rows="2" placeholder="Jelaskan desain yang diinginkan customer (foto, teks, konsep, warna)..." required></textarea>
+                  </div>
+
+                  <!-- Link Referensi File / Google Drive -->
+                  <div class="col-12">
+                    <label class="form-label fw-bold small text-muted mb-1">Link Referensi Desain / Google Drive / Foto</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
+                      <input type="text" class="form-control" id="customLinkRef" placeholder="https://drive.google.com/... (opsional)">
+                    </div>
+                  </div>
+
+                  <!-- Total Harga Kesepakatan -->
+                  <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label fw-bold small text-muted mb-0">Total Kesepakatan Harga (Rp) <span class="text-danger">*</span></label>
+                      <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none fw-semibold small" onclick="hitungAutoHargaCustom()">
+                        <i class="bi bi-magic me-1"></i>Tarif Otomatis
+                      </button>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light fw-bold">Rp</span>
+                      <input type="number" class="form-control font-mono-num fw-extrabold fs-5 text-success" id="customTotalHarga" value="4000" min="0" required>
+                    </div>
+                  </div>
+
+                  <!-- Status Pembayaran -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1">Status Pembayaran <span class="text-danger">*</span></label>
+                    <select class="form-select fw-bold" id="customStatusBayar" onchange="toggleCustomDpInput()">
+                      <option value="Lunas" selected>Lunas</option>
+                      <option value="DP">DP (Uang Muka)</option>
+                      <option value="Belum Bayar">Belum Bayar</option>
+                    </select>
+                  </div>
+
+                  <!-- Nominal DP (conditional) -->
+                  <div class="col-12 col-md-6 d-none" id="customColDp">
+                    <label class="form-label fw-bold small text-muted mb-1">Nominal DP Diterima (Rp) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light fw-bold">Rp</span>
+                      <input type="number" class="form-control font-mono-num fw-bold" id="customNominalDp" value="0" min="0">
+                    </div>
+                  </div>
+
+                  <!-- Metode Pengambilan -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1">Metode Pengambilan</label>
+                    <select class="form-select fw-semibold" id="customMetodeAmbil">
+                      <option value="Ambil di Booth">Ambil di Booth</option>
+                      <option value="Kirim Kurir">Kirim Kurir / Ekspedisi</option>
+                      <option value="COD">COD</option>
+                    </select>
+                  </div>
+
+                  <!-- Status Pesanan Awal -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1">Status Pengerjaan Awal</label>
+                    <select class="form-select fw-semibold" id="customStatusPesanan">
+                      <option value="Pending" selected>Pending (Antrean)</option>
+                      <option value="Desain Disetujui">Desain Disetujui</option>
+                      <option value="Dalam Produksi">Dalam Produksi</option>
+                      <option value="Siap Diambil/Dikirim">Siap Diambil/Dikirim</option>
+                      <option value="Selesai">Selesai</option>
+                    </select>
+                  </div>
+
+                  <!-- Catatan / Alamat Pengiriman -->
+                  <div class="col-12">
+                    <label class="form-label fw-bold small text-muted mb-1">Catatan Tambahan / Alamat Pengiriman</label>
+                    <input type="text" class="form-control" id="customCatatan" placeholder="Catatan khusus, batas waktu pengambilan, atau alamat lengkap...">
+                  </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                  <button type="submit" class="btn btn-warning px-4 fw-bold text-dark" id="btnSimpanCustom">
+                    <span id="btnSimpanCustomText"><i class="bi bi-save2-fill me-1"></i> Simpan Pesanan Custom</span>
+                    <span id="btnSimpanCustomSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                  </button>
+                  <button type="button" class="btn btn-light border px-3" onclick="resetPesananCustomForm()">Reset Form</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Daftar Pesanan Custom Card -->
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-card-checklist text-primary"></i> Daftar Pesanan Custom Event Ini
+              </h6>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary font-mono-num" id="customTotalSummary">0 pesanan</span>
+                <button class="btn btn-sm btn-light border" onclick="loadPesananCustomList()" title="Segarkan Data">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="customLoadingList" class="text-center py-4 text-muted d-none">
+                <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+                <span>Memuat pesanan custom...</span>
+              </div>
+              <div id="customListEmpty" class="text-center py-5 text-muted small">
+                <i class="bi bi-journal-x fs-1 opacity-50"></i>
+                <p class="mt-2 mb-0">Belum ada pesanan custom yang dicatat untuk event ini.</p>
+              </div>
+              <div class="table-responsive d-none" id="customTableContainer">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-3" style="width: 45px;">No</th>
+                      <th>Customer & Kontak</th>
+                      <th>Produk</th>
+                      <th>Detail Desain</th>
+                      <th>Harga & Bayar</th>
+                      <th>Status Pengerjaan</th>
+                      <th class="text-end pe-3" style="width: 80px;">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="customTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VIEW 4: REKAP                              -->
+  <!-- ========================================== -->
+  <div id="view-rekap" class="spa-view d-none">
+    <div class="container py-4">
+      <div class="mb-4">
+        <h3 class="fw-bold mb-1">📊 Rekap Hasil Event</h3>
+        <p class="text-muted small mb-0">Laporan komprehensif penjualan, stok sisa, dan cetak PDF rekapitulasi.</p>
+      </div>
+
+      <!-- Selector Event -->
+      <div class="card mb-4" id="rekapEventSelectorCard">
+        <div class="card-body py-3">
+          <label class="form-label fw-bold small text-muted">Pilih Event untuk Melihat Laporan</label>
+          <select class="form-select fw-bold" id="rekapEventSelector" onchange="loadRekapData()">
+            <option value="">— Pilih event —</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="rekapErrorAlert" class="alert alert-danger d-none my-3 shadow-sm"></div>
+
+      <div id="rekapLoading" class="text-center py-5 d-none text-muted">
+        <div class="spinner-border text-primary me-2"></div>
+        <span>Menghitung rekapitulasi data...</span>
+      </div>
+
+      <div id="rekapPanel" class="d-none">
+        <!-- Header Khusus Print Kertas / PDF -->
+        <div class="d-none d-print-block mb-4 border-bottom pb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h3 class="fw-bold mb-1" style="color: #0f172a;">PinTrack — Laporan Rekapitulasi Event</h3>
+              <h5 class="fw-bold text-primary mb-1" id="rekapPrintNamaEvent">-</h5>
+              <div class="text-muted small" id="rekapPrintMetaEvent">-</div>
+            </div>
+            <div class="text-end text-muted small">
+              <div>Dicetak: <strong id="rekapPrintTimestamp">-</strong></div>
+              <div class="badge bg-success text-white mt-1">Laporan Resmi</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Bento KPI Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="card stat-card stat-pin h-100">
+              <div class="card-body">
+                <div class="stat-icon-wrapper" style="background:#fef3c7; color:#d97706;">
+                  <i class="bi bi-pin-angle-fill"></i>
+                </div>
+                <div class="stat-value font-mono-num" id="rekapPinTerjual">0</div>
+                <div class="stat-label">Total PIN Terjual</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card stat-card stat-gk h-100">
+              <div class="card-body">
+                <div class="stat-icon-wrapper" style="background:#cffafe; color:#0891b2;">
+                  <i class="bi bi-key-fill"></i>
+                </div>
+                <div class="stat-value font-mono-num" id="rekapGkTerjual">0</div>
+                <div class="stat-label">Total GK Terjual</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card stat-card h-100">
+              <div class="card-body">
+                <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+                  <i class="bi bi-receipt"></i>
+                </div>
+                <div class="stat-value font-mono-num" id="rekapJmlTransaksi">0</div>
+                <div class="stat-label">Jumlah Pembeli</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card stat-card stat-rev h-100" style="background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);">
+              <div class="card-body">
+                <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+                  <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="stat-value font-mono-num text-success fs-4" id="rekapTotalHarga">Rp 0</div>
+                <div class="stat-label">Total Omzet Penjualan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabel Performa Stok -->
+        <div class="card mb-4">
+          <div class="card-header py-3">
+            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+              <i class="bi bi-boxes text-primary"></i> Laporan Arus Stok Produk
+            </h6>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table text-center align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-start">Produk</th>
+                    <th>Stok Awal</th>
+                    <th class="text-success">Terjual</th>
+                    <th class="text-muted">Sisa</th>
+                    <th style="min-width: 140px;">Rasio Terjual</th>
+                  </tr>
+                </thead>
+                <tbody id="rekapStokTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kalkulasi Modal & Pembagian Hasil -->
+        <div class="card mb-4 border-0 shadow-sm overflow-hidden" id="rekapPembagianCard">
+          <div class="card-header py-3" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);">
+            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2 text-success">
+              <i class="bi bi-people-fill fs-5"></i> Kalkulasi Modal & Pembagian Hasil Penjualan
+            </h6>
+          </div>
+          <div class="card-body">
+            <!-- 3 Financial Stat Boxes -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="p-3 rounded-3 border text-center h-100" style="background:#fef3c7;">
+                  <div class="small fw-semibold text-muted mb-1"><i class="bi bi-cash-coin me-1"></i> Total Modal Terpakai</div>
+                  <div class="fs-4 fw-extrabold font-mono-num" id="rekapTotalModal" style="color:#b45309;">Rp 0</div>
+                  <small class="text-muted" id="rekapModalDetail">Berdasarkan stok terjual</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 rounded-3 border text-center h-100" style="background:#dcfce7;">
+                  <div class="small fw-semibold text-muted mb-1"><i class="bi bi-graph-up-arrow me-1"></i> Keuntungan Bersih</div>
+                  <div class="fs-4 fw-extrabold font-mono-num text-success" id="rekapKeuntungan">Rp 0</div>
+                  <small class="text-muted">Total Omzet − Total Modal</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 rounded-3 border text-center h-100" style="background:#ede9fe;">
+                  <div class="small fw-semibold text-muted mb-1"><i class="bi bi-person-check-fill me-1"></i> Bagian per Orang</div>
+                  <div class="fs-4 fw-extrabold font-mono-num" id="rekapBagianPerOrang" style="color:#7c3aed;">Rp 0</div>
+                  <small class="text-muted" id="rekapPesertaCountInfo">Dibagi rata ke semua penjual</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabel Daftar Nama & Pembagian -->
+            <div id="rekapPesertaList" class="d-none mt-3">
+              <h6 class="fw-bold small text-muted mb-2 d-flex align-items-center gap-1">
+                <i class="bi bi-person-lines-fill text-primary"></i> RINCIAN HAK BAGI HASIL ANGGOTA
+              </h6>
+              <div class="table-responsive border rounded">
+                <table class="table table-sm table-striped align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 50px;">#</th>
+                      <th>Nama yang Ikut Berjualan</th>
+                      <th class="text-end">Nominal Bagian</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rekapPesertaTable"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="rekapNoPeserta" class="text-center text-muted small py-3 bg-light rounded border mt-2">
+              <i class="bi bi-info-circle me-1"></i> Belum ada nama peserta yang didaftarkan pada event ini. Anda dapat mengedit event di halaman <strong>Planning</strong> untuk menambahkan nama anggota.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol PDF & Cetak Callout -->
+        <div class="card border-0 mb-4" id="rekapPdfCalloutCard" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+          <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+              <div>
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                  <i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i> Cetak Laporan Resmi Event
+                </h5>
+                <p class="text-light opacity-75 small mb-0">Unduh dokumen PDF resmi atau cetak langsung dari browser Anda.</p>
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-outline-light px-3 fw-bold d-flex align-items-center gap-2 shadow-sm" onclick="cetakLaporanLangsung()" id="rekapBtnPrint" type="button">
+                  <i class="bi bi-printer-fill fs-5"></i>
+                  <span>Cetak Langsung</span>
+                </button>
+                <button class="btn btn-danger px-4 fw-bold shadow d-flex align-items-center gap-2" onclick="bukaPdfRekap()" id="rekapBtnPdf" type="button">
+                  <span id="rekapBtnPdfText" class="d-flex align-items-center gap-1">
+                    <i class="bi bi-cloud-arrow-down-fill fs-5"></i> Buka & Download PDF
+                  </span>
+                  <span id="rekapBtnPdfSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Box link unduh cadangan (jika popup diblokir browser) -->
+            <div id="rekapPdfSuccessBox" class="mt-3 p-3 bg-white text-dark rounded-3 shadow border border-success d-none">
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                  <div>
+                    <div class="fw-bold text-success">File PDF Rekap Berhasil Dibuat!</div>
+                    <small class="text-muted">Jika tab unduhan belum terbuka otomatis, silakan klik tombol di samping:</small>
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <a id="rekapPdfDirectLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-danger px-3 fw-bold shadow-sm d-flex align-items-center gap-1">
+                    <i class="bi bi-file-earmark-pdf-fill fs-5"></i> Buka File PDF
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabel Detail Transaksi Lengkap -->
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center py-3">
+            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+              <i class="bi bi-journal-text text-primary"></i> Rincian Seluruh Transaksi
+            </h6>
+            <span class="badge bg-light text-dark border" id="rekapTransaksiCount">0 transaksi</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Waktu</th>
+                    <th>Kategori</th>
+                    <th class="text-center">Pin</th>
+                    <th class="text-center">GK</th>
+                    <th class="text-center">Total Item</th>
+                    <th class="text-end">Nominal</th>
+                  </tr>
+                </thead>
+                <tbody id="rekapTransaksiTable"></tbody>
+                <tfoot id="rekapTransaksiFooter" class="table-light fw-bold"></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VIEW 5: SETTINGS                           -->
+  <!-- ========================================== -->
+  <div id="view-settings" class="spa-view d-none">
+    <div class="container py-4">
+      <div class="mb-4">
+        <h3 class="fw-bold mb-1">⚙️ Pengaturan Sistem</h3>
+        <p class="text-muted small mb-0">Sesuaikan aturan diskon bundeling harga dan inisialisasi database.</p>
+      </div>
+
+      <!-- Pricing Rules Card -->
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2 text-primary">
+            <i class="bi bi-tags-fill"></i> Aturan Harga & Bundeling
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-primary py-2 d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-info-circle-fill fs-5"></i>
+            <small>Pin dan Gantungan Kunci memiliki harga yang sama. Pembelian campuran otomatis digabung untuk mendapatkan harga diskon bundel.</small>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-muted">Harga Satuan (1 pcs)</label>
+              <div class="input-group">
+                <span class="input-group-text">Rp</span>
+                <input type="number" class="form-control font-mono-num fw-bold" id="setHargaSatuan" min="0">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-muted">Jumlah Min. Bundel</label>
+              <div class="input-group">
+                <input type="number" class="form-control font-mono-num fw-bold" id="setMinBundel" min="2">
+                <span class="input-group-text">pcs</span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-muted">Harga Bundel Paket</label>
+              <div class="input-group">
+                <span class="input-group-text">Rp</span>
+                <input type="number" class="form-control font-mono-num fw-bold" id="setHargaBundel" min="0">
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 bg-light rounded-3 border" id="setPreviewHargaRule">
+                <small class="text-muted">Memuat preview...</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button class="btn btn-primary fw-semibold px-4" onclick="simpanSettingsHarga()">
+              <i class="bi bi-check2-circle me-1"></i> Simpan Aturan Harga
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning Stok Threshold -->
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+            <i class="bi bi-bell-fill text-warning"></i> Ambang Batas Peringatan Stok
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold small text-muted">Beri tanda peringatan jika stok tersisa &le;</label>
+            <div class="input-group">
+              <input type="number" class="form-control font-mono-num fw-bold" id="setStokWarning" min="1">
+              <span class="input-group-text">pcs</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-outline-primary fw-semibold" onclick="simpanSettingsWarning()">
+              Simpan Ambang Batas
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Database Setup -->
+      <div class="card">
+        <div class="card-header py-3">
+          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2 text-danger">
+            <i class="bi bi-database-fill-gear"></i> Pemeliharaan Database Spreadsheet
+          </h6>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">
+            Jika kolom sheet belum sinkron dengan pembaruan terbaru (misal: kolom modal per produk & peserta), atau lembar sheet belum lengkap, klik tombol di bawah untuk menyinkronkan struktur tabel `Events`, `Transaksi`, `Pengaturan`, dan `RekapTemp` secara otomatis tanpa menghapus data yang sudah ada.
+          </p>
+          <button class="btn btn-primary fw-semibold" onclick="setupSettingsDb()">
+            <i class="bi bi-arrow-repeat me-1"></i> Sinkronkan Struktur Database Spreadsheet
+          </button>
+          <div id="setSetupResult" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <?!= include('toast'); ?>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC                           -->
+  <!-- ========================================== -->
+  <script>
+    var currentView = 'dashboard';
+    var allEventsCache = [];
+
+    // ── SPA ROUTER ─────────────────────────────────────────────
+    function navigateTo(viewName, param) {
+      document.querySelectorAll('.spa-view').forEach(function(el) {
+        el.classList.add('d-none');
+      });
+
+      document.querySelectorAll('.pintrack-nav .nav-links a').forEach(function(el) {
+        el.classList.remove('active');
+      });
+
+      var target = document.getElementById('view-' + viewName);
+      if (target) {
+        target.classList.remove('d-none');
+        currentView = viewName;
+        var navEl = document.getElementById('nav-' + viewName);
+        if (navEl) navEl.classList.add('active');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (viewName === 'dashboard') {
+        loadDashboard();
+      } else if (viewName === 'planning') {
+        loadPlanningList();
+        if (param) loadEventForEdit(param);
+        else resetPlanForm();
+      } else if (viewName === 'counting') {
+        loadCountingEvents(param);
+      } else if (viewName === 'rekap') {
+        loadRekapEvents(param);
+      } else if (viewName === 'settings') {
+        loadSettings();
+      }
+    }
+
+    // ── GENERAL HELPERS ────────────────────────────────────────
+    function formatRp(n) {
+      return 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+    }
+    function escHtml(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function showError(e) {
+      showToast('Error: ' + (e.message || e), 'danger');
+    }
+    function toInputDate(dmy) {
+      if (!dmy) return '';
+      var parts = dmy.split('/');
+      if (parts.length !== 3) return '';
+      return parts[2] + '-' + parts[1] + '-' + parts[0];
+    }
+    function formatDateTimeStr(date) {
+      if (!date) return '';
+      var d = new Date(date);
+      var day   = String(d.getDate()).padStart(2, '0');
+      var month = String(d.getMonth() + 1).padStart(2, '0');
+      var year  = d.getFullYear();
+      var hours = String(d.getHours()).padStart(2, '0');
+      var mins  = String(d.getMinutes()).padStart(2, '0');
+      return day + '/' + month + '/' + year + ' ' + hours + ':' + mins;
+    }
+
+    // ── DASHBOARD LOGIC ────────────────────────────────────────
+    function loadDashboard() {
+      document.getElementById('dashLoadingEvents').classList.remove('d-none');
+      document.getElementById('dashEventListContainer').classList.add('d-none');
+      document.getElementById('dashEmptyEvents').classList.add('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          allEventsCache = JSON.parse(json);
+          renderDashboard(allEventsCache);
+        })
+        .withFailureHandler(showError)
+        .apiGetAllEvents();
+    }
+
+    function renderDashboard(events) {
+      var aktif    = events.filter(function(e){ return e.status === 'aktif'; });
+      var totalPin = events.reduce(function(s,e){ return s + (e.stok_sisa_pin || 0); }, 0);
+      var totalGk  = events.reduce(function(s,e){ return s + (e.stok_sisa_gk || 0); }, 0);
+
+      document.getElementById('dashTotalEvent').textContent = events.length;
+      document.getElementById('dashEventAktif').textContent = aktif.length;
+      document.getElementById('dashTotalPin').textContent   = totalPin;
+      document.getElementById('dashTotalGk').textContent    = totalGk;
+
+      document.getElementById('dashLoadingEvents').classList.add('d-none');
+      if (events.length === 0) {
+        document.getElementById('dashEmptyEvents').classList.remove('d-none');
+        return;
+      }
+      document.getElementById('dashEventListContainer').classList.remove('d-none');
+
+      var tbody = document.getElementById('dashEventTableBody');
+      tbody.innerHTML = events.map(function(e) {
+        var statusBadge = e.status === 'aktif'
+          ? '<span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-record-fill me-1"></i>Aktif</span>'
+          : e.status === 'selesai'
+          ? '<span class="badge bg-secondary bg-opacity-10 text-secondary">Selesai</span>'
+          : '<span class="badge bg-warning bg-opacity-10 text-warning">Draft</span>';
+
+        var pinPct = e.stok_awal_pin > 0 ? Math.round(e.stok_sisa_pin / e.stok_awal_pin * 100) : 0;
+        var gkPct  = e.stok_awal_gk  > 0 ? Math.round(e.stok_sisa_gk  / e.stok_awal_gk  * 100) : 0;
+
+        return '<tr>'
+          + '<td class="fw-bold text-dark">' + escHtml(e.nama_event) + '</td>'
+          + '<td><small class="text-muted"><i class="bi bi-calendar3 me-1"></i>' + e.tanggal_mulai + ' – ' + e.tanggal_selesai + '</small></td>'
+          + '<td><small class="text-muted"><i class="bi bi-geo-alt me-1"></i>' + escHtml(e.lokasi) + '</small></td>'
+          + '<td class="text-center">'
+          +   '<div class="font-mono-num fw-bold text-warning">' + e.stok_sisa_pin + ' <span class="text-muted fw-normal">/ ' + e.stok_awal_pin + '</span></div>'
+          +   '<div class="progress mt-1" style="height:4px"><div class="progress-bar bg-warning" style="width:' + pinPct + '%"></div></div>'
+          + '</td>'
+          + '<td class="text-center">'
+          +   '<div class="font-mono-num fw-bold text-info">' + e.stok_sisa_gk + ' <span class="text-muted fw-normal">/ ' + e.stok_awal_gk + '</span></div>'
+          +   '<div class="progress mt-1" style="height:4px"><div class="progress-bar bg-info" style="width:' + gkPct + '%"></div></div>'
+          + '</td>'
+          + '<td class="text-center">' + statusBadge + '</td>'
+          + '<td class="text-center">'
+          +   '<div class="btn-group btn-group-sm">'
+          +     '<button onclick="navigateTo(\'counting\', \'' + e.event_id + '\')" class="btn btn-outline-primary" title="Buka Kasir Counting"><i class="bi bi-cart3"></i></button>'
+          +     '<button onclick="navigateTo(\'rekap\', \'' + e.event_id + '\')" class="btn btn-outline-success" title="Lihat Rekap"><i class="bi bi-bar-chart"></i></button>'
+          +     '<button onclick="navigateTo(\'planning\', \'' + e.event_id + '\')" class="btn btn-outline-secondary" title="Edit Event"><i class="bi bi-pencil"></i></button>'
+          +     '<button onclick="hapusEventDash(\'' + e.event_id + '\')" class="btn btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>'
+          +   '</div>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function hapusEventDash(eventId) {
+      if (!confirm('Hapus event ini? Semua data transaksinya TIDAK akan ikut terhapus.')) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = JSON.parse(res);
+          if (r.status === 'ok') {
+            showToast('Event berhasil dihapus!', 'success');
+            loadDashboard();
+          } else {
+            showToast(r.message, 'danger');
+          }
+        })
+        .withFailureHandler(showError)
+        .apiDeleteEvent(eventId);
+    }
+
+    // ── PLANNING LOGIC ─────────────────────────────────────────
+    var planningEditId = null;
+    var planPesertaList = [];
+
+    function tambahPeserta() {
+      var input = document.getElementById('planPesertaInput');
+      var nama  = input.value.trim();
+      if (!nama) return;
+      if (planPesertaList.indexOf(nama) !== -1) {
+        showToast('Nama "' + nama + '" sudah ada di daftar!', 'warning');
+        return;
+      }
+      planPesertaList.push(nama);
+      input.value = '';
+      renderPesertaTags();
+      updatePesertaHidden();
+    }
+
+    function hapusPeserta(nama) {
+      planPesertaList = planPesertaList.filter(function(n) { return n !== nama; });
+      renderPesertaTags();
+      updatePesertaHidden();
+    }
+
+    function renderPesertaTags() {
+      var container = document.getElementById('planPesertaTags');
+      if (planPesertaList.length === 0) {
+        container.innerHTML = '<span class="text-muted small">Belum ada nama peserta ditambahkan.</span>';
+        return;
+      }
+      container.innerHTML = planPesertaList.map(function(nama) {
+        return '<span class="badge d-inline-flex align-items-center gap-1 px-3 py-2" style="background:#e0e7ff;color:#3730a3;font-size:0.85rem;">'
+          + '<i class="bi bi-person-fill"></i> ' + escHtml(nama)
+          + ' <button type="button" class="btn-close btn-close-sm ms-1" style="font-size:0.65rem;" onclick="hapusPeserta(\'' + escHtml(nama).replace(/'/g, "\\'") + '\')" aria-label="Hapus"></button>'
+          + '</span>';
+      }).join('');
+    }
+
+    function updatePesertaHidden() {
+      document.getElementById('planPeserta').value = planPesertaList.join(',');
+    }
+
+    function loadPlanningList() {
+      document.getElementById('planLoadingEvents').classList.remove('d-none');
+      document.getElementById('planEventCards').classList.add('d-none');
+      document.getElementById('planEmptyEvents').classList.add('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          var events = JSON.parse(json);
+          allEventsCache = events;
+          document.getElementById('planLoadingEvents').classList.add('d-none');
+          if (events.length === 0) {
+            document.getElementById('planEmptyEvents').classList.remove('d-none');
+            return;
+          }
+          document.getElementById('planEventCards').classList.remove('d-none');
+          renderPlanningCards(events);
+        })
+        .withFailureHandler(showError)
+        .apiGetAllEvents();
+    }
+
+    function renderPlanningCards(events) {
+      var container = document.getElementById('planEventCards');
+      container.innerHTML = events.map(function(e) {
+        var statusBadge = e.status === 'aktif'
+          ? '<span class="badge bg-success bg-opacity-10 text-success">Aktif</span>'
+          : '<span class="badge bg-secondary bg-opacity-10 text-secondary">Selesai</span>';
+
+        var pesertaArr = e.peserta ? e.peserta.split(',').filter(function(s){ return s.trim() !== ''; }) : [];
+        var pesertaText = pesertaArr.length > 0
+          ? '<span class="badge bg-light text-primary border"><i class="bi bi-people-fill me-1"></i>' + pesertaArr.length + ' Peserta: ' + escHtml(pesertaArr.join(', ')) + '</span>'
+          : '<span class="badge bg-light text-muted border">Belum ada peserta</span>';
+
+        return '<div class="card mb-3 border p-3">'
+          + '<div class="d-flex justify-content-between align-items-start">'
+          + '<div>'
+          +   '<h6 class="fw-bold mb-1 text-dark">' + escHtml(e.nama_event) + ' ' + statusBadge + '</h6>'
+          +   '<small class="text-muted"><i class="bi bi-geo-alt me-1"></i>' + escHtml(e.lokasi) + ' &nbsp;|&nbsp; <i class="bi bi-calendar-event me-1"></i>' + e.tanggal_mulai + ' – ' + e.tanggal_selesai + '</small>'
+          + '</div>'
+          + '<div class="btn-group btn-group-sm">'
+          +   '<button class="btn btn-outline-primary" onclick="editPlanEventDirect(\'' + e.event_id + '\')"><i class="bi bi-pencil"></i></button>'
+          +   '<button class="btn btn-outline-danger" onclick="hapusPlanEvent(\'' + e.event_id + '\')"><i class="bi bi-trash"></i></button>'
+          + '</div></div>'
+          + '<div class="row g-2 mt-2 pt-2 border-top">'
+          +   '<div class="col-6"><span class="badge" style="background:#fef3c7;color:#b45309;"><i class="bi bi-pin-angle-fill me-1"></i>PIN</span> <strong class="font-mono-num">' + e.stok_awal_pin + ' pcs</strong> <small class="text-muted">(Modal: ' + formatRp(e.modal_pin || 0) + ')</small></div>'
+          +   '<div class="col-6"><span class="badge" style="background:#cffafe;color:#0e7490;"><i class="bi bi-key-fill me-1"></i>GK</span> <strong class="font-mono-num">' + e.stok_awal_gk + ' pcs</strong> <small class="text-muted">(Modal: ' + formatRp(e.modal_gk || 0) + ')</small></div>'
+          + '</div>'
+          + '<div class="mt-2">' + pesertaText + '</div>'
+          + (e.catatan ? '<div class="mt-2 text-muted small"><i class="bi bi-chat-left-text me-1"></i>' + escHtml(e.catatan) + '</div>' : '')
+          + '</div>';
+      }).join('');
+    }
+
+    function submitPlanEvent(e) {
+      e.preventDefault();
+      var btn = document.getElementById('planBtnSubmit');
+      var txt = document.getElementById('planBtnSubmitText');
+      var spn = document.getElementById('planBtnSubmitSpinner');
+      btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+
+      var nama     = document.getElementById('planNamaEvent').value.trim();
+      var lokasi   = document.getElementById('planLokasiEvent').value.trim();
+      var tglMulai = document.getElementById('planTglMulai').value;
+      var tglSls   = document.getElementById('planTglSelesai').value;
+      var stokPin  = parseInt(document.getElementById('planStokPin').value) || 0;
+      var stokGk   = parseInt(document.getElementById('planStokGk').value) || 0;
+      var catatan  = document.getElementById('planCatatanEvent').value.trim();
+      var modalPin = parseInt(document.getElementById('planModalPin').value) || 0;
+      var modalGk  = parseInt(document.getElementById('planModalGk').value) || 0;
+      var peserta  = document.getElementById('planPeserta').value.trim();
+
+      if (tglMulai > tglSls) {
+        showToast('Tanggal selesai harus setelah tanggal mulai!', 'warning');
+        resetPlanBtn();
+        return;
+      }
+
+      var handler = function(res) {
+        var r = JSON.parse(res);
+        resetPlanBtn();
+        if (r.status === 'ok') {
+          showToast(planningEditId ? 'Event diupdate!' : 'Event berhasil dibuat!', 'success');
+          resetPlanForm();
+          loadPlanningList();
+        } else {
+          showToast(r.message, 'danger');
+        }
+      };
+
+      if (planningEditId) {
+        google.script.run.withSuccessHandler(handler).withFailureHandler(showError)
+          .apiUpdateEvent(planningEditId, nama, tglMulai, tglSls, lokasi, stokPin, stokGk, catatan, modalPin, modalGk, peserta);
+      } else {
+        google.script.run.withSuccessHandler(handler).withFailureHandler(showError)
+          .apiCreateEvent(nama, tglMulai, tglSls, lokasi, stokPin, stokGk, catatan, modalPin, modalGk, peserta);
+      }
+    }
+
+    function loadEventForEdit(eventId) {
+      var found = allEventsCache.find(function(item) { return item.event_id === eventId; });
+      if (found) {
+        populatePlanEditForm(found);
+      } else {
+        google.script.run
+          .withSuccessHandler(function(json) {
+            var e = JSON.parse(json);
+            if (e) populatePlanEditForm(e);
+          })
+          .apiGetEventById(eventId);
+      }
+    }
+
+    function editPlanEventDirect(eventId) {
+      loadEventForEdit(eventId);
+    }
+
+    function populatePlanEditForm(e) {
+      planningEditId = e.event_id;
+      document.getElementById('planFormTitle').innerHTML = '<i class="bi bi-pencil-square me-1"></i> Edit Event: ' + escHtml(e.nama_event);
+      document.getElementById('planEditEventId').value = e.event_id;
+      document.getElementById('planNamaEvent').value   = e.nama_event;
+      document.getElementById('planLokasiEvent').value = e.lokasi;
+      document.getElementById('planTglMulai').value    = toInputDate(e.tanggal_mulai);
+      document.getElementById('planTglSelesai').value  = toInputDate(e.tanggal_selesai);
+      document.getElementById('planStokPin').value     = e.stok_awal_pin;
+      document.getElementById('planStokGk').value      = e.stok_awal_gk;
+      document.getElementById('planCatatanEvent').value = e.catatan || '';
+      document.getElementById('planModalPin').value    = e.modal_pin || 0;
+      document.getElementById('planModalGk').value     = e.modal_gk || 0;
+      planPesertaList = e.peserta ? e.peserta.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; }) : [];
+      renderPesertaTags();
+      updatePesertaHidden();
+      document.getElementById('planBtnSubmitText').innerHTML = '<i class="bi bi-check2-circle me-1"></i> Update Event';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function hapusPlanEvent(eventId) {
+      if (!confirm('Hapus event ini?')) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = JSON.parse(res);
+          if (r.status === 'ok') {
+            showToast('Event berhasil dihapus!', 'success');
+            loadPlanningList();
+          } else {
+            showToast(r.message, 'danger');
+          }
+        })
+        .withFailureHandler(showError)
+        .apiDeleteEvent(eventId);
+    }
+
+    function resetPlanForm() {
+      planningEditId = null;
+      document.getElementById('planForm').reset();
+      document.getElementById('planEditEventId').value = '';
+      document.getElementById('planModalPin').value = 0;
+      document.getElementById('planModalGk').value  = 0;
+      document.getElementById('planPesertaInput').value = '';
+      planPesertaList = [];
+      renderPesertaTags();
+      updatePesertaHidden();
+      document.getElementById('planFormTitle').innerHTML = '<i class="bi bi-calendar-plus-fill me-1"></i> Buat Event Baru';
+      document.getElementById('planBtnSubmitText').innerHTML = '<i class="bi bi-check2-circle me-1"></i> Simpan Event';
+    }
+
+    function resetPlanBtn() {
+      var btn = document.getElementById('planBtnSubmit');
+      btn.disabled = false;
+      document.getElementById('planBtnSubmitText').classList.remove('d-none');
+      document.getElementById('planBtnSubmitSpinner').classList.add('d-none');
+    }
+
+    // ── COUNTING (POS KASIR) LOGIC ─────────────────────────────
+    var currentCountEvent = null;
+    var currentCountHarga = 0;
+    var countStokAwalPin  = 0;
+    var countStokAwalGk   = 0;
+
+    function loadCountingEvents(autoSelectId) {
+      google.script.run
+        .withSuccessHandler(function(json) {
+          var events = JSON.parse(json);
+          var sel = document.getElementById('countEventSelector');
+          sel.innerHTML = '<option value="">— Ketuk untuk memilih event aktif —</option>';
+          events.forEach(function(e) {
+            sel.innerHTML += '<option value="' + e.event_id + '">' + escHtml(e.nama_event) + ' (' + e.tanggal_mulai + ')</option>';
+          });
+          if (autoSelectId) {
+            sel.value = autoSelectId;
+          }
+          onCountingEventChange();
+        })
+        .withFailureHandler(showError)
+        .apiGetActiveEvents();
+    }
+
+    function onCountingEventChange() {
+      var eventId = document.getElementById('countEventSelector').value;
+      if (!eventId) {
+        document.getElementById('countMainPanel').classList.add('d-none');
+        currentCountEvent = null;
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          currentCountEvent = JSON.parse(json);
+          if (!currentCountEvent) return;
+          countStokAwalPin = currentCountEvent.stok_awal_pin;
+          countStokAwalGk  = currentCountEvent.stok_awal_gk;
+          updateCountingStokDisplay(currentCountEvent.stok_sisa_pin, currentCountEvent.stok_sisa_gk);
+          document.getElementById('countMainPanel').classList.remove('d-none');
+          loadCountingRiwayat();
+          resetCountingForm();
+          loadPesananCustomList();
+        })
+        .withFailureHandler(showError)
+        .apiGetEventById(eventId);
+    }
+
+    function updateCountingStokDisplay(sisaPin, sisaGk) {
+      document.getElementById('countSisaPin').textContent = sisaPin;
+      document.getElementById('countSisaGk').textContent  = sisaGk;
+
+      var pctPin = countStokAwalPin > 0 ? (sisaPin / countStokAwalPin * 100) : 0;
+      var pctGk  = countStokAwalGk  > 0 ? (sisaGk  / countStokAwalGk  * 100) : 0;
+      document.getElementById('countProgressPin').style.width = pctPin + '%';
+      document.getElementById('countProgressGk').style.width  = pctGk  + '%';
+
+      var alertEl = document.getElementById('countAlertStok');
+      var msgs = [];
+      document.getElementById('countCardPin').classList.remove('border-danger', 'border-warning');
+      document.getElementById('countCardGk').classList.remove('border-danger', 'border-warning');
+
+      if (sisaPin === 0) {
+        document.getElementById('countCardPin').classList.add('border-danger');
+        msgs.push('Stok PIN habis! Mohon restok atau hentikan penjualan Pin.');
+      } else if (sisaPin <= 10) {
+        document.getElementById('countCardPin').classList.add('border-warning');
+        msgs.push('Perhatian: Stok PIN tersisa ' + sisaPin + ' pcs.');
+      }
+
+      if (sisaGk === 0) {
+        document.getElementById('countCardGk').classList.add('border-danger');
+        msgs.push('Stok GK habis! Mohon restok atau hentikan penjualan Gantungan Kunci.');
+      } else if (sisaGk <= 10) {
+        document.getElementById('countCardGk').classList.add('border-warning');
+        msgs.push('Perhatian: Stok GK tersisa ' + sisaGk + ' pcs.');
+      }
+
+      if (msgs.length > 0) {
+        alertEl.innerHTML = msgs.map(function(m){
+          return '<div class="alert alert-warning py-2 px-3 mb-1 d-flex align-items-center gap-2 small"><i class="bi bi-exclamation-triangle-fill fs-6"></i>' + m + '</div>';
+        }).join('');
+        alertEl.classList.remove('d-none');
+      } else {
+        alertEl.classList.add('d-none');
+      }
+    }
+
+    function quickAdd(inputId, val) {
+      var el = document.getElementById(inputId);
+      el.value = (parseInt(el.value) || 0) + val;
+      kalkulasiCounting();
+    }
+
+    function quickSet(inputId, val) {
+      var el = document.getElementById(inputId);
+      el.value = val;
+      kalkulasiCounting();
+    }
+
+    function kalkulasiCounting() {
+      var jenis = document.querySelector('input[name="countJenisProduk"]:checked').value;
+      var qtyPin = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('countQtyPin').value) || 0);
+      var qtyGk  = (jenis === 'pin') ? 0 : (parseInt(document.getElementById('countQtyGk').value) || 0);
+      var total  = qtyPin + qtyGk;
+
+      if (total <= 0) {
+        document.getElementById('countPreviewQty').textContent   = '0 pcs';
+        document.getElementById('countPreviewHarga').textContent = 'Rp 0';
+        document.getElementById('countPreviewDetail').textContent = '';
+        document.getElementById('countBtnKonfirmasi').disabled   = true;
+        currentCountHarga = 0;
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = JSON.parse(res);
+          if (r.status !== 'ok') return;
+          var d = r.data;
+          currentCountHarga = d.total_harga;
+          document.getElementById('countPreviewQty').textContent   = total + ' pcs';
+          document.getElementById('countPreviewHarga').textContent = formatRp(d.total_harga);
+          var detail = '';
+          if (d.jumlah_bundel > 0) detail += d.jumlah_bundel + ' Bundel (×Rp' + Number(d.harga_bundel).toLocaleString('id-ID') + ')';
+          if (d.sisa_qty > 0) detail += (detail ? ' + ' : '') + d.sisa_qty + ' Satuan (×Rp' + Number(d.harga_satuan).toLocaleString('id-ID') + ')';
+          document.getElementById('countPreviewDetail').textContent = detail;
+          document.getElementById('countBtnKonfirmasi').disabled = false;
+        })
+        .apiKalkulasiHarga(qtyPin, qtyGk);
+    }
+
+    function adjustCounting(id, delta) {
+      var el = document.getElementById(id);
+      var val = (parseInt(el.value) || 0) + delta;
+      el.value = Math.max(0, val);
+      kalkulasiCounting();
+    }
+
+    function konfirmasiCounting() {
+      if (!currentCountEvent) return;
+      var jenis = document.querySelector('input[name="countJenisProduk"]:checked').value;
+      var qtyPin = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('countQtyPin').value) || 0);
+      var qtyGk  = (jenis === 'pin') ? 0 : (parseInt(document.getElementById('countQtyGk').value) || 0);
+
+      if (qtyPin + qtyGk <= 0) {
+        showToast('Masukkan jumlah produk!', 'warning');
+        return;
+      }
+
+      if (qtyPin > currentCountEvent.stok_sisa_pin) {
+        showToast('Stok Pin tidak cukup! Sisa ' + currentCountEvent.stok_sisa_pin + ' pcs', 'danger');
+        return;
+      }
+      if (qtyGk > currentCountEvent.stok_sisa_gk) {
+        showToast('Stok GK tidak cukup! Sisa ' + currentCountEvent.stok_sisa_gk + ' pcs', 'danger');
+        return;
+      }
+
+      var btn = document.getElementById('countBtnKonfirmasi');
+      var txt = document.getElementById('countBtnKonfText');
+      var spn = document.getElementById('countBtnKonfSpinner');
+      btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          var r = JSON.parse(res);
+          if (r.status === 'ok') {
+            currentCountEvent.stok_sisa_pin = r.data.sisa_pin;
+            currentCountEvent.stok_sisa_gk  = r.data.sisa_gk;
+            updateCountingStokDisplay(r.data.sisa_pin, r.data.sisa_gk);
+            showToast('✅ Berhasil! ' + formatRp(currentCountHarga), 'success');
+            resetCountingForm();
+            loadCountingRiwayat();
+          } else {
+            showToast(r.message, 'danger');
+          }
+        })
+        .withFailureHandler(function(e) {
+          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          showToast('Error: ' + e.message, 'danger');
+        })
+        .apiCreateTransaksi(currentCountEvent.event_id, jenis, qtyPin, qtyGk, currentCountHarga, '');
+    }
+
+    function undoCountingTransaksi() {
+      if (!currentCountEvent) return;
+      if (!confirm('Batalkan transaksi terakhir pada event ini? Stok produk akan dikembalikan.')) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = JSON.parse(res);
+          if (r.status === 'ok') {
+            currentCountEvent.stok_sisa_pin = r.data.sisa_pin;
+            currentCountEvent.stok_sisa_gk  = r.data.sisa_gk;
+            updateCountingStokDisplay(r.data.sisa_pin, r.data.sisa_gk);
+            showToast('↩️ Transaksi terakhir dibatalkan', 'info');
+            loadCountingRiwayat();
+          } else {
+            showToast(r.message, 'danger');
+          }
+        })
+        .withFailureHandler(showError)
+        .apiDeleteLastTransaksi(currentCountEvent.event_id);
+    }
+
+    function loadCountingRiwayat() {
+      if (!currentCountEvent) return;
+      document.getElementById('countLoadingRiwayat').classList.remove('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          document.getElementById('countLoadingRiwayat').classList.add('d-none');
+          var list = JSON.parse(json);
+          var container = document.getElementById('countRiwayatList');
+          var empty     = document.getElementById('countEmptyRiwayat');
+          var totalHar  = list.reduce(function(s,t){ return s + (t.total_harga || 0); }, 0);
+
+          document.getElementById('countTodayTotal').textContent = list.length + ' transaksi · ' + formatRp(totalHar);
+
+          if (list.length === 0) {
+            container.innerHTML = '';
+            empty.classList.remove('d-none');
+            return;
+          }
+          empty.classList.add('d-none');
+          container.innerHTML = list.reverse().map(function(t) {
+            var badgeColor = t.jenis_produk === 'pin' ? 'background:#fef3c7;color:#b45309;' : (t.jenis_produk === 'gk' ? 'background:#cffafe;color:#0e7490;' : 'background:#e0e7ff;color:#3730a3;');
+            var label = t.jenis_produk === 'pin' ? 'PIN' : t.jenis_produk === 'gk' ? 'GK' : 'CAMPUR';
+            var detail = '';
+            if (t.qty_pin > 0) detail += 'Pin ×' + t.qty_pin;
+            if (t.qty_gk  > 0) detail += (detail ? ' + ' : '') + 'GK ×' + t.qty_gk;
+
+            return '<div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">'
+              + '<div>'
+              +   '<span class="badge me-2" style="' + badgeColor + '">' + label + '</span>'
+              +   '<span class="small fw-semibold text-dark">' + detail + '</span>'
+              + '</div>'
+              + '<div class="text-end">'
+              +   '<div class="fw-bold font-mono-num text-success">' + formatRp(t.total_harga) + '</div>'
+              +   '<small class="text-muted" style="font-size:0.75rem;"><i class="bi bi-clock me-1"></i>' + t.timestamp + '</small>'
+              + '</div></div>';
+          }).join('');
+        })
+        .withFailureHandler(showError)
+        .apiGetTodayTransaksi(currentCountEvent.event_id);
+    }
+
+    function resetCountingForm() {
+      document.getElementById('countQtyPin').value = 0;
+      document.getElementById('countQtyGk').value  = 0;
+      document.getElementById('jPin').checked = true;
+      document.getElementById('countColPin').classList.remove('d-none');
+      document.getElementById('countColGk').classList.add('d-none');
+      document.getElementById('countPreviewQty').textContent   = '0 pcs';
+      document.getElementById('countPreviewHarga').textContent = 'Rp 0';
+      document.getElementById('countPreviewDetail').textContent = '';
+      document.getElementById('countBtnKonfirmasi').disabled   = true;
+      currentCountHarga = 0;
+    }
+
+    // ── PESANAN CUSTOM (DESAIN BERBEDA) LOGIC ───────────────────
+    function switchCountingTab(tab) {
+      var tabRegBtn = document.getElementById('tabBtnReguler');
+      var tabCusBtn = document.getElementById('tabBtnCustom');
+      var secReg    = document.getElementById('countSectionReguler');
+      var secCus    = document.getElementById('countSectionCustom');
+
+      if (tab === 'custom') {
+        tabRegBtn.classList.remove('active', 'tab-reguler-active');
+        tabCusBtn.classList.add('active', 'tab-custom-active');
+        secReg.classList.add('d-none');
+        secCus.classList.remove('d-none');
+        loadPesananCustomList();
+      } else {
+        tabCusBtn.classList.remove('active', 'tab-custom-active');
+        tabRegBtn.classList.add('active', 'tab-reguler-active');
+        secCus.classList.add('d-none');
+        secReg.classList.remove('d-none');
+      }
+    }
+
+    function toggleCustomProdukInputs() {
+      var checkedRadio = document.querySelector('input[name="customJenisProduk"]:checked');
+      var jenis = checkedRadio ? checkedRadio.value : 'pin';
+      var colPin = document.getElementById('customColPin');
+      var colGk  = document.getElementById('customColGk');
+      var qtyPinInput = document.getElementById('customQtyPin');
+      var qtyGkInput  = document.getElementById('customQtyGk');
+
+      if (jenis === 'pin') {
+        colPin.classList.remove('d-none');
+        colGk.classList.add('d-none');
+        qtyGkInput.value = 0;
+        if (parseInt(qtyPinInput.value) <= 0) qtyPinInput.value = 1;
+      } else if (jenis === 'gk') {
+        colPin.classList.add('d-none');
+        colGk.classList.remove('d-none');
+        qtyPinInput.value = 0;
+        if (parseInt(qtyGkInput.value) <= 0) qtyGkInput.value = 1;
+      } else {
+        colPin.classList.remove('d-none');
+        colGk.classList.remove('d-none');
+        if (parseInt(qtyPinInput.value) <= 0) qtyPinInput.value = 1;
+        if (parseInt(qtyGkInput.value) <= 0) qtyGkInput.value = 1;
+      }
+      hitungAutoHargaCustom();
+    }
+
+    function adjustCustomQty(id, delta) {
+      var el = document.getElementById(id);
+      var val = (parseInt(el.value) || 0) + delta;
+      el.value = Math.max(0, val);
+      kalkulasiCustomTotal();
+    }
+
+    function quickAddCustom(id, delta) {
+      adjustCustomQty(id, delta);
+    }
+
+    function kalkulasiCustomTotal() {
+      hitungAutoHargaCustom();
+    }
+
+    function toggleCustomDpInput() {
+      var status = document.getElementById('customStatusBayar').value;
+      var colDp  = document.getElementById('customColDp');
+      var dpInput = document.getElementById('customNominalDp');
+      if (status === 'DP') {
+        colDp.classList.remove('d-none');
+        if (parseInt(dpInput.value) <= 0) {
+          var total = parseInt(document.getElementById('customTotalHarga').value) || 0;
+          dpInput.value = Math.round(total / 2);
+        }
+      } else {
+        colDp.classList.add('d-none');
+        dpInput.value = 0;
+      }
+    }
+
+    function hitungAutoHargaCustom() {
+      var checkedRadio = document.querySelector('input[name="customJenisProduk"]:checked');
+      var jenis = checkedRadio ? checkedRadio.value : 'pin';
+      var qtyPin = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('customQtyPin').value) || 0);
+      var qtyGk  = (jenis === 'pin') ? 0 : (parseInt(document.getElementById('customQtyGk').value) || 0);
+
+      if (qtyPin + qtyGk <= 0) {
+        document.getElementById('customTotalHarga').value = 0;
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          try {
+            var r = (typeof res === 'string') ? JSON.parse(res) : res;
+            if (r && r.status === 'ok' && r.data) {
+              document.getElementById('customTotalHarga').value = r.data.total_harga;
+              if (document.getElementById('customStatusBayar').value === 'DP') {
+                document.getElementById('customNominalDp').value = Math.round(r.data.total_harga / 2);
+              }
+            }
+          } catch(e) {}
+        })
+        .apiKalkulasiHarga(qtyPin, qtyGk);
+    }
+
+    function simpanPesananCustom(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      if (!currentCountEvent) {
+        showToast('Pilih event yang sedang berjalan terlebih dahulu!', 'warning');
+        return;
+      }
+
+      var namaCust   = (document.getElementById('customNamaCust').value || '').trim();
+      var kontakCust = (document.getElementById('customKontakCust').value || '').trim();
+      var checkedRadio = document.querySelector('input[name="customJenisProduk"]:checked');
+      var jenis      = checkedRadio ? checkedRadio.value : 'pin';
+      var qtyPin     = (jenis === 'gk') ? 0 : (parseInt(document.getElementById('customQtyPin').value) || 0);
+      var qtyGk      = (jenis === 'pin') ? 0 : (parseInt(document.getElementById('customQtyGk').value) || 0);
+      var deskripsi  = (document.getElementById('customDeskripsiDesain').value || '').trim();
+      var linkRef    = (document.getElementById('customLinkRef').value || '').trim();
+      var totalHarga = parseInt(document.getElementById('customTotalHarga').value) || 0;
+      var statusBayar= document.getElementById('customStatusBayar').value;
+      var nominalDp  = (statusBayar === 'DP') ? (parseInt(document.getElementById('customNominalDp').value) || 0) : 0;
+      var metodeAmbil= document.getElementById('customMetodeAmbil').value;
+      var statusPes  = document.getElementById('customStatusPesanan').value;
+      var catatan    = (document.getElementById('customCatatan').value || '').trim();
+
+      if (!namaCust) {
+        showToast('Nama customer wajib diisi!', 'warning');
+        return;
+      }
+      if (!kontakCust) {
+        showToast('No. WhatsApp / HP customer wajib diisi!', 'warning');
+        return;
+      }
+      if (qtyPin + qtyGk <= 0) {
+        showToast('Jumlah qty produk minimal 1 pcs!', 'warning');
+        return;
+      }
+      if (!deskripsi) {
+        showToast('Deskripsi desain wajib diisi!', 'warning');
+        return;
+      }
+
+      var btn = document.getElementById('btnSimpanCustom');
+      var txt = document.getElementById('btnSimpanCustomText');
+      var spn = document.getElementById('btnSimpanCustomSpinner');
+      btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          var r = (typeof res === 'string') ? JSON.parse(res) : res;
+          if (r.status === 'ok') {
+            showToast('✅ Pesanan custom untuk ' + escHtml(namaCust) + ' berhasil disimpan!', 'success');
+            resetPesananCustomForm();
+            loadPesananCustomList();
+          } else {
+            showToast(r.message || 'Gagal menyimpan pesanan', 'danger');
+          }
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          showError(err);
+        })
+        .apiCreatePesananCustom(
+          currentCountEvent.event_id,
+          namaCust,
+          kontakCust,
+          jenis,
+          qtyPin,
+          qtyGk,
+          deskripsi,
+          linkRef,
+          totalHarga,
+          statusBayar,
+          nominalDp,
+          statusPes,
+          metodeAmbil,
+          catatan
+        );
+    }
+
+    function resetPesananCustomForm() {
+      document.getElementById('customNamaCust').value = '';
+      document.getElementById('customKontakCust').value = '';
+      document.getElementById('cPin').checked = true;
+      document.getElementById('customQtyPin').value = 1;
+      document.getElementById('customQtyGk').value = 0;
+      document.getElementById('customDeskripsiDesain').value = '';
+      document.getElementById('customLinkRef').value = '';
+      document.getElementById('customTotalHarga').value = 4000;
+      document.getElementById('customStatusBayar').value = 'Lunas';
+      document.getElementById('customNominalDp').value = 0;
+      document.getElementById('customMetodeAmbil').value = 'Ambil di Booth';
+      document.getElementById('customStatusPesanan').value = 'Pending';
+      document.getElementById('customCatatan').value = '';
+      toggleCustomProdukInputs();
+      toggleCustomDpInput();
+    }
+
+    function cleanWaPhone(phone) {
+      var p = String(phone || '').replace(/[^0-9]/g, '');
+      if (p.startsWith('0')) {
+        p = '62' + p.slice(1);
+      } else if (!p.startsWith('62') && p.length > 5) {
+        p = '62' + p;
+      }
+      return p;
+    }
+
+    function loadPesananCustomList() {
+      if (!currentCountEvent) return;
+      var loading = document.getElementById('customLoadingList');
+      var empty   = document.getElementById('customListEmpty');
+      var tableCont = document.getElementById('customTableContainer');
+      var tbody   = document.getElementById('customTableBody');
+      var summary = document.getElementById('customTotalSummary');
+      var badgeTab= document.getElementById('badgeCustomCount');
+
+      loading.classList.remove('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          loading.classList.add('d-none');
+          var list = (typeof json === 'string') ? JSON.parse(json) : json;
+          if (!Array.isArray(list)) list = [];
+
+          var count = list.length;
+          summary.textContent = count + ' pesanan';
+
+          if (count > 0) {
+            badgeTab.textContent = count;
+            badgeTab.style.display = 'inline-block';
+          } else {
+            badgeTab.style.display = 'none';
+          }
+
+          if (count === 0) {
+            empty.classList.remove('d-none');
+            tableCont.classList.add('d-none');
+            tbody.innerHTML = '';
+            return;
+          }
+
+          empty.classList.add('d-none');
+          tableCont.classList.remove('d-none');
+
+          var sorted = list.slice().reverse();
+
+          tbody.innerHTML = sorted.map(function(item, idx) {
+            var num = idx + 1;
+            var cleanPhone = cleanWaPhone(item.kontak_customer);
+            var waMessage = encodeURIComponent('Halo Kak ' + item.nama_customer + ', mengenai pesanan custom di PinTrack event ' + (currentCountEvent ? currentCountEvent.nama_event : '') + '...');
+            var waUrl = 'https://wa.me/' + cleanPhone + '?text=' + waMessage;
+
+            var prodBadge = item.jenis_produk === 'pin' 
+              ? '<span class="badge" style="background:#fef3c7; color:#b45309;"><i class="bi bi-pin-angle-fill"></i> PIN</span>' 
+              : (item.jenis_produk === 'gk' 
+                ? '<span class="badge" style="background:#cffafe; color:#0e7490;"><i class="bi bi-key-fill"></i> GK</span>' 
+                : '<span class="badge" style="background:#e0e7ff; color:#3730a3;"><i class="bi bi-bag-plus-fill"></i> Campur</span>');
+
+            var qtyDetail = '';
+            if (item.qty_pin > 0) qtyDetail += item.qty_pin + ' Pin';
+            if (item.qty_gk > 0) qtyDetail += (qtyDetail ? ' + ' : '') + item.qty_gk + ' GK';
+            if (!qtyDetail) qtyDetail = item.total_qty + ' pcs';
+
+            var bayarBadge = item.status_pembayaran === 'Lunas'
+              ? '<span class="badge bg-success bg-opacity-10 text-success border border-success">Lunas</span>'
+              : (item.status_pembayaran === 'DP'
+                ? '<span class="badge bg-warning bg-opacity-10 text-dark border border-warning">DP ' + formatRp(item.nominal_dp) + '</span>'
+                : '<span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Belum Bayar</span>');
+
+            var refLinkHtml = '';
+            if (item.link_referensi && (item.link_referensi.startsWith('http://') || item.link_referensi.startsWith('https://'))) {
+              refLinkHtml = '<div class="mt-1"><a href="' + escHtml(item.link_referensi) + '" target="_blank" class="badge bg-light text-primary border text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>Buka Link Ref</a></div>';
+            } else if (item.link_referensi) {
+              refLinkHtml = '<div class="small text-muted text-truncate mt-1" style="max-width:200px;"><i class="bi bi-link-45deg"></i>' + escHtml(item.link_referensi) + '</div>';
+            }
+
+            var statusOptions = [
+              'Pending',
+              'Desain Disetujui',
+              'Dalam Produksi',
+              'Siap Diambil/Dikirim',
+              'Selesai',
+              'Dibatalkan'
+            ].map(function(st) {
+              var sel = (item.status_pesanan === st) ? 'selected' : '';
+              return '<option value="' + st + '" ' + sel + '>' + st + '</option>';
+            }).join('');
+
+            var noteHtml = item.catatan ? '<div class="small text-muted fst-italic mt-1"><i class="bi bi-sticky me-1"></i>' + escHtml(item.catatan) + '</div>' : '';
+            var methodBadge = '<span class="badge bg-light text-dark border small ms-1">' + escHtml(item.metode_pengambilan || 'Ambil di Booth') + '</span>';
+
+            return '<tr>'
+              + '<td class="ps-3 text-muted fw-bold">' + num + '</td>'
+              + '<td>'
+              +   '<div class="fw-bold text-dark">' + escHtml(item.nama_customer) + '</div>'
+              +   '<div class="d-flex align-items-center gap-1 mt-1">'
+              +     '<a href="' + waUrl + '" target="_blank" class="btn btn-sm btn-outline-success py-0 px-2 fw-semibold" style="font-size:0.75rem;" title="Hubungi via WhatsApp">'
+              +       '<i class="bi bi-whatsapp me-1"></i>' + escHtml(item.kontak_customer)
+              +     '</a>'
+              +   '</div>'
+              +   '<div class="text-muted small mt-1" style="font-size:0.72rem;"><i class="bi bi-clock me-1"></i>' + (item.timestamp || '-') + '</div>'
+              + '</td>'
+              + '<td>'
+              +   '<div class="mb-1">' + prodBadge + ' ' + methodBadge + '</div>'
+              +   '<div class="fw-bold font-mono-num">' + qtyDetail + ' <span class="text-muted fw-normal">(' + item.total_qty + ' pcs)</span></div>'
+              + '</td>'
+              + '<td style="max-width: 250px;">'
+              +   '<div class="small text-dark" style="white-space: pre-wrap;">' + escHtml(item.deskripsi_desain) + '</div>'
+              +   refLinkHtml
+              +   noteHtml
+              + '</td>'
+              + '<td>'
+              +   '<div class="fw-bold font-mono-num text-success fs-6">' + formatRp(item.total_harga) + '</div>'
+              +   '<div class="mt-1">' + bayarBadge + '</div>'
+              + '</td>'
+              + '<td>'
+              +   '<select class="form-select form-select-sm fw-bold border-secondary-subtle" style="min-width:145px;" onchange="updateCustomOrderStatus(\'' + item.pesanan_id + '\', this.value)">'
+              +     statusOptions
+              +   '</select>'
+              + '</td>'
+              + '<td class="text-end pe-3">'
+              +   '<button type="button" class="btn btn-sm btn-outline-danger p-1" onclick="hapusPesananCustom(\'' + item.pesanan_id + '\', \'' + escHtml(item.nama_customer) + '\')" title="Hapus pesanan">'
+              +     '<i class="bi bi-trash3"></i>'
+              +   '</button>'
+              + '</td>'
+              + '</tr>';
+          }).join('');
+        })
+        .withFailureHandler(function(err) {
+          loading.classList.add('d-none');
+          showError(err);
+        })
+        .apiGetPesananCustomByEvent(currentCountEvent.event_id);
+    }
+
+    function updateCustomOrderStatus(pesananId, newStatus) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = (typeof res === 'string') ? JSON.parse(res) : res;
+          if (r.status === 'ok') {
+            showToast('Status pesanan diubah: ' + newStatus, 'info');
+          } else {
+            showToast(r.message || 'Gagal mengubah status', 'danger');
+            loadPesananCustomList();
+          }
+        })
+        .withFailureHandler(function(err) {
+          showError(err);
+          loadPesananCustomList();
+        })
+        .apiUpdateStatusPesananCustom(pesananId, newStatus, null);
+    }
+
+    function hapusPesananCustom(pesananId, namaCust) {
+      if (!confirm('Apakah kamu yakin ingin menghapus pesanan custom milik ' + namaCust + '?')) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = (typeof res === 'string') ? JSON.parse(res) : res;
+          if (r.status === 'ok') {
+            showToast('Pesanan custom berhasil dihapus', 'info');
+            loadPesananCustomList();
+          } else {
+            showToast(r.message || 'Gagal menghapus', 'danger');
+          }
+        })
+        .withFailureHandler(showError)
+        .apiDeletePesananCustom(pesananId);
+    }
+
+    // ── REKAP LOGIC ────────────────────────────────────────────
+    var currentRekapEventId = null;
+
+    function loadRekapEvents(autoSelectId) {
+      document.getElementById('rekapLoading').classList.remove('d-none');
+      document.getElementById('rekapPanel').classList.add('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(json) {
+          var events = JSON.parse(json);
+          var sel = document.getElementById('rekapEventSelector');
+          sel.innerHTML = '<option value="">— Pilih event —</option>';
+          events.forEach(function(e) {
+            sel.innerHTML += '<option value="' + e.event_id + '">' + escHtml(e.nama_event) + ' (' + e.status + ')</option>';
+          });
+
+          if (autoSelectId) {
+            sel.value = autoSelectId;
+          } else if (events && events.length > 0) {
+            // Otomatis pilih event aktif atau event pertama agar halaman tidak kosong
+            var active = events.find(function(e) { return e.status === 'aktif'; }) || events[0];
+            if (active) sel.value = active.event_id;
+          }
+
+          loadRekapData();
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('rekapLoading').classList.add('d-none');
+          showError(err);
+        })
+        .apiGetAllEvents();
+    }
+
+    function loadRekapData() {
+      currentRekapEventId = document.getElementById('rekapEventSelector').value;
+      var errEl = document.getElementById('rekapErrorAlert');
+      if (errEl) errEl.classList.add('d-none');
+
+      if (!currentRekapEventId) {
+        document.getElementById('rekapLoading').classList.add('d-none');
+        document.getElementById('rekapPanel').classList.add('d-none');
+        return;
+      }
+
+      var sBox = document.getElementById('rekapPdfSuccessBox');
+      if (sBox) sBox.classList.add('d-none');
+
+      document.getElementById('rekapLoading').classList.remove('d-none');
+      document.getElementById('rekapPanel').classList.add('d-none');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          document.getElementById('rekapLoading').classList.add('d-none');
+          var r;
+          try {
+            r = (typeof res === 'string') ? JSON.parse(res) : res;
+          } catch(err) {
+            console.error('Format data tidak valid:', err, res);
+            showError('Respon server tidak valid');
+            if (errEl) {
+              errEl.textContent = 'Gagal memproses data server: ' + err.message;
+              errEl.classList.remove('d-none');
+            }
+            return;
+          }
+
+          if (!r || r.status !== 'ok') {
+            var msg = (r && r.message) ? r.message : 'Gagal memuat rekap event.';
+            showToast(msg, 'danger');
+            if (errEl) {
+              errEl.textContent = msg;
+              errEl.classList.remove('d-none');
+            }
+            return;
+          }
+
+          renderRekap(r.data);
+        })
+        .withFailureHandler(function(e) {
+          document.getElementById('rekapLoading').classList.add('d-none');
+          showError(e);
+          if (errEl) {
+            errEl.textContent = 'Gagal mengambil data event dari Google Sheets: ' + (e.message || e);
+            errEl.classList.remove('d-none');
+          }
+        })
+        .apiGetRekapEvent(currentRekapEventId);
+    }
+
+    function renderRekap(d) {
+      var errEl = document.getElementById('rekapErrorAlert');
+      if (errEl) errEl.classList.add('d-none');
+
+      try {
+        if (!d) return;
+
+        // Tampilkan panel rekap terlebih dahulu
+        document.getElementById('rekapPanel').classList.remove('d-none');
+
+        if (d.event) {
+          var printNama = document.getElementById('rekapPrintNamaEvent');
+          var printMeta = document.getElementById('rekapPrintMetaEvent');
+          var printTs   = document.getElementById('rekapPrintTimestamp');
+          if (printNama) printNama.textContent = d.event.nama_event || '-';
+          if (printMeta) printMeta.textContent = 'Lokasi: ' + (d.event.lokasi || '-') + ' | Tanggal: ' + (d.event.tanggal_mulai || '-') + ' s/d ' + (d.event.tanggal_selesai || '-');
+          if (printTs) printTs.textContent = formatDateTimeStr(new Date());
+        }
+
+        document.getElementById('rekapPinTerjual').textContent   = (d.total_qty_pin || 0) + ' pcs';
+        document.getElementById('rekapGkTerjual').textContent    = (d.total_qty_gk || 0) + ' pcs';
+        document.getElementById('rekapJmlTransaksi').textContent = d.jml_transaksi || 0;
+        document.getElementById('rekapTotalHarga').textContent   = formatRp(d.total_harga);
+
+        var stokRows = [
+          { label:'📌 Pin', icon:'bi-pin-angle-fill', color:'#b45309', awal: d.stok_awal_pin, terjual: d.total_qty_pin, sisa: d.stok_sisa_pin },
+          { label:'🔑 Gantungan Kunci', icon:'bi-key-fill', color:'#0e7490', awal: d.stok_awal_gk, terjual: d.total_qty_gk, sisa: d.stok_sisa_gk },
+          { label:'🛒 Total Seluruh Produk', icon:'bi-boxes', color:'#4338ca', awal: (d.stok_awal_pin + d.stok_awal_gk), terjual: d.total_qty, sisa: (d.stok_sisa_pin + d.stok_sisa_gk) }
+        ];
+        document.getElementById('rekapStokTable').innerHTML = stokRows.map(function(r) {
+          var pct = r.awal > 0 ? Math.round(r.terjual / r.awal * 100) : 0;
+          return '<tr>'
+            + '<td class="text-start fw-bold" style="color:' + r.color + '"><i class="bi ' + r.icon + ' me-1"></i>' + r.label + '</td>'
+            + '<td class="font-mono-num fw-semibold">' + r.awal + '</td>'
+            + '<td class="font-mono-num text-success fw-bold">' + r.terjual + '</td>'
+            + '<td class="font-mono-num text-muted">' + r.sisa + '</td>'
+            + '<td><div class="d-flex align-items-center justify-content-center gap-2">'
+            + '<div class="progress flex-grow-1" style="height:8px"><div class="progress-bar bg-success" style="width:' + pct + '%"></div></div>'
+            + '<span class="font-mono-num small fw-bold">' + pct + '%</span></div></td>'
+            + '</tr>';
+        }).join('');
+
+        document.getElementById('rekapTransaksiCount').textContent = (d.transaksi ? d.transaksi.length : 0) + ' transaksi';
+        document.getElementById('rekapTransaksiTable').innerHTML = (d.transaksi || []).map(function(t, i) {
+          var prodBadge = t.jenis_produk === 'pin' ? '<span class="badge" style="background:#fef3c7;color:#b45309;">Pin</span>' : (t.jenis_produk === 'gk' ? '<span class="badge" style="background:#cffafe;color:#0e7490;">GK</span>' : '<span class="badge" style="background:#e0e7ff;color:#3730a3;">Campuran</span>');
+          return '<tr>'
+            + '<td class="text-muted font-mono-num">' + (i + 1) + '</td>'
+            + '<td><small class="text-muted"><i class="bi bi-clock me-1"></i>' + t.timestamp + '</small></td>'
+            + '<td>' + prodBadge + '</td>'
+            + '<td class="text-center font-mono-num">' + (t.qty_pin || '-') + '</td>'
+            + '<td class="text-center font-mono-num">' + (t.qty_gk  || '-') + '</td>'
+            + '<td class="text-center fw-bold font-mono-num">' + t.total_qty + '</td>'
+            + '<td class="text-end text-success fw-bold font-mono-num">' + formatRp(t.total_harga) + '</td>'
+            + '</tr>';
+        }).join('');
+
+        document.getElementById('rekapTransaksiFooter').innerHTML =
+          '<tr><td colspan="5" class="text-end">TOTAL PENJUALAN</td>'
+          + '<td class="text-center font-mono-num">' + (d.total_qty || 0) + ' pcs</td>'
+          + '<td class="text-end text-success font-mono-num fs-6">' + formatRp(d.total_harga) + '</td></tr>';
+
+        // Render Kalkulasi Modal & Pembagian Hasil
+        var totalModal = d.total_modal || 0;
+        var keuntungan = d.keuntungan_bersih || 0;
+        var bagian     = d.bagian_per_orang || 0;
+        var pesertaArr = d.daftar_peserta || [];
+
+        document.getElementById('rekapTotalModal').textContent = formatRp(totalModal);
+        document.getElementById('rekapModalDetail').textContent = '(Pin: ' + (d.total_qty_pin || 0) + '×' + formatRp(d.modal_pin || 0) + ') + (GK: ' + (d.total_qty_gk || 0) + '×' + formatRp(d.modal_gk || 0) + ')';
+        document.getElementById('rekapKeuntungan').textContent = formatRp(keuntungan);
+        document.getElementById('rekapBagianPerOrang').textContent = formatRp(bagian);
+
+        if (pesertaArr.length > 0) {
+          document.getElementById('rekapPesertaCountInfo').textContent = 'Dibagi rata untuk ' + pesertaArr.length + ' orang';
+          document.getElementById('rekapNoPeserta').classList.add('d-none');
+          document.getElementById('rekapPesertaList').classList.remove('d-none');
+          document.getElementById('rekapPesertaTable').innerHTML = pesertaArr.map(function(nama, idx) {
+            return '<tr>'
+              + '<td class="text-muted font-mono-num">' + (idx + 1) + '</td>'
+              + '<td class="fw-semibold text-dark"><i class="bi bi-person-fill text-primary me-2"></i>' + escHtml(nama) + '</td>'
+              + '<td class="text-end fw-bold font-mono-num text-success fs-6">' + formatRp(bagian) + '</td>'
+              + '</tr>';
+          }).join('');
+        } else {
+          document.getElementById('rekapPesertaCountInfo').textContent = 'Belum ada peserta terdaftar';
+          document.getElementById('rekapPesertaList').classList.add('d-none');
+          document.getElementById('rekapNoPeserta').classList.remove('d-none');
+        }
+
+        document.getElementById('rekapPanel').classList.remove('d-none');
+      } catch (err) {
+        console.error('Error saat render rekap:', err);
+        showError(err);
+        var errEl = document.getElementById('rekapErrorAlert');
+        if (errEl) {
+          errEl.textContent = 'Gagal menampilkan data rekap: ' + err.message;
+          errEl.classList.remove('d-none');
+        }
+      }
+    }
+
+    function bukaPdfRekap() {
+      if (!currentRekapEventId) {
+        showToast('Silakan pilih event terlebih dahulu!', 'warning');
+        return;
+      }
+      var btn = document.getElementById('rekapBtnPdf');
+      var txt = document.getElementById('rekapBtnPdfText');
+      var spn = document.getElementById('rekapBtnPdfSpinner');
+      btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+
+      // Pre-open tab baru secara sinkron dari event klik untuk mencegah popup blocker di browser
+      var pdfWindow = null;
+      try {
+        pdfWindow = window.open('about:blank', '_blank');
+        if (pdfWindow) {
+          pdfWindow.document.write('<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Menyiapkan PDF Rekap...</title><style>body{font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f8fafc;color:#1e293b}.box{background:#fff;padding:32px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.08);text-align:center;max-width:380px;margin:16px}.spin{width:44px;height:44px;border:4px solid #e2e8f0;border-top-color:#ef4444;border-radius:50%;animation:s 0.8s linear infinite;margin:0 auto 16px}@keyframes s{to{transform:rotate(360deg)}}h3{margin:0 0 8px;font-size:1.25rem}p{margin:0;color:#64748b;font-size:0.95rem;line-height:1.4}</style></head><body><div class="box"><div class="spin"></div><h3>Menyiapkan Dokumen PDF</h3><p>Mengompilasi ringkasan penjualan & tabel transaksi... Dokumen akan otomatis dibuka dalam sekejap.</p></div></body></html>');
+        }
+      } catch(e) {
+        pdfWindow = null;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          var r = JSON.parse(res);
+          if (r.status === 'ok') {
+            var url = r.data.pdf_url;
+
+            // 1. Arahkan tab yang sudah dibuka secara sinkron
+            if (pdfWindow && !pdfWindow.closed) {
+              pdfWindow.location.href = url;
+            } else {
+              try { window.open(url, '_blank'); } catch(err) {}
+            }
+
+            // 2. Aktifkan tombol cadangan download langsung di kartu callout
+            var sBox  = document.getElementById('rekapPdfSuccessBox');
+            var dLink = document.getElementById('rekapPdfDirectLink');
+            if (sBox && dLink) {
+              dLink.href = url;
+              sBox.classList.remove('d-none');
+            }
+
+            // 3. Trigger klik anchor unduhan
+            try {
+              var a = document.createElement('a');
+              a.href = url;
+              a.target = '_blank';
+              a.download = (r.data.event_nama || 'Rekap') + '.pdf';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            } catch(e) {}
+
+            showToast('PDF berhasil dibuat!', 'success');
+          } else {
+            if (pdfWindow && !pdfWindow.closed) pdfWindow.close();
+            showToast(r.message || 'Gagal membuat PDF', 'danger');
+          }
+        })
+        .withFailureHandler(function(e) {
+          btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+          if (pdfWindow && !pdfWindow.closed) pdfWindow.close();
+          showToast('Gagal generate PDF: ' + e.message, 'danger');
+        })
+        .apiGeneratePdfUrl(currentRekapEventId);
+    }
+
+    function cetakLaporanLangsung() {
+      if (!currentRekapEventId) {
+        showToast('Silakan pilih event terlebih dahulu!', 'warning');
+        return;
+      }
+      window.print();
+    }
+
+    // ── SETTINGS LOGIC ─────────────────────────────────────────
+    function loadSettings() {
+      google.script.run
+        .withSuccessHandler(function(json) {
+          var s = JSON.parse(json);
+          document.getElementById('setHargaSatuan').value = s.harga_satuan || 4000;
+          document.getElementById('setMinBundel').value   = s.min_bundel || 3;
+          document.getElementById('setHargaBundel').value = s.harga_bundel || 10000;
+          document.getElementById('setStokWarning').value = s.stok_warning || 10;
+          updateSettingsPreview();
+        })
+        .withFailureHandler(showError)
+        .apiGetAllSettings();
+    }
+
+    function updateSettingsPreview() {
+      var sat = parseInt(document.getElementById('setHargaSatuan').value) || 4000;
+      var bnd = parseInt(document.getElementById('setHargaBundel').value) || 10000;
+      var min = parseInt(document.getElementById('setMinBundel').value)   || 3;
+      var bnd7 = Math.floor(7 / min);
+      var sisa7 = 7 % min;
+      var total7 = (bnd7 * bnd) + (sisa7 * sat);
+
+      document.getElementById('setPreviewHargaRule').innerHTML =
+        '<div class="d-flex flex-wrap gap-3 align-items-center">'
+        + '<span><i class="bi bi-tag me-1"></i>Satuan: <strong>' + formatRp(sat) + '</strong></span>'
+        + '<span><i class="bi bi-box-seam me-1"></i>Bundel (' + min + ' pcs): <strong>' + formatRp(bnd) + '</strong></span>'
+        + '<span class="text-primary"><i class="bi bi-check-all me-1"></i>Contoh 7 pcs: <strong>' + formatRp(total7) + '</strong> (' + bnd7 + ' bundel + ' + sisa7 + ' satuan)</span>'
+        + '</div>';
+    }
+
+    function simpanSettingsHarga() {
+      var sat = document.getElementById('setHargaSatuan').value;
+      var bnd = document.getElementById('setHargaBundel').value;
+      var min = document.getElementById('setMinBundel').value;
+      google.script.run.withSuccessHandler(function(){ showToast('Harga satuan berhasil disimpan', 'success'); }).apiUpdateSetting('harga_satuan', sat);
+      google.script.run.withSuccessHandler(function(){ showToast('Harga bundel berhasil disimpan', 'success'); }).apiUpdateSetting('harga_bundel', bnd);
+      google.script.run.withSuccessHandler(function(){ showToast('Minimum bundel berhasil disimpan', 'success'); }).apiUpdateSetting('min_bundel', min);
+    }
+
+    function simpanSettingsWarning() {
+      var val = document.getElementById('setStokWarning').value;
+      google.script.run
+        .withSuccessHandler(function(){ showToast('Ambang batas stok disimpan', 'success'); })
+        .apiUpdateSetting('stok_warning', val);
+    }
+
+    function setupSettingsDb() {
+      document.getElementById('setSetupResult').innerHTML = '<div class="spinner-border spinner-border-sm text-danger"></div> Menyiapkan lembar spreadsheet...';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var r = JSON.parse(res);
+          document.getElementById('setSetupResult').innerHTML =
+            r.status === 'ok'
+            ? '<div class="alert alert-success py-2"><i class="bi bi-check-circle-fill me-2"></i>' + r.data + '</div>'
+            : '<div class="alert alert-danger py-2"><i class="bi bi-x-circle-fill me-2"></i>' + r.message + '</div>';
+        })
+        .withFailureHandler(function(e) {
+          document.getElementById('setSetupResult').innerHTML = '<div class="alert alert-danger py-2"><i class="bi bi-x-circle-fill me-2"></i>' + e.message + '</div>';
+        })
+        .apiSetupDatabase();
+    }
+
+    // ── INITIALIZATION ─────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('input[name="countJenisProduk"]').forEach(function(r) {
+        r.addEventListener('change', function() {
+          var val = this.value;
+          if (val === 'pin') {
+            document.getElementById('countColGk').classList.add('d-none');
+            document.getElementById('countColPin').classList.remove('d-none');
+            document.getElementById('countQtyGk').value = 0;
+          } else if (val === 'gk') {
+            document.getElementById('countColPin').classList.add('d-none');
+            document.getElementById('countColGk').classList.remove('d-none');
+            document.getElementById('countQtyPin').value = 0;
+          } else {
+            document.getElementById('countColPin').classList.remove('d-none');
+            document.getElementById('countColGk').classList.remove('d-none');
+          }
+          kalkulasiCounting();
+        });
+      });
+
+      ['setHargaSatuan', 'setHargaBundel', 'setMinBundel'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateSettingsPreview);
+      });
+
+      var inpPeserta = document.getElementById('planPesertaInput');
+      if (inpPeserta) {
+        inpPeserta.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            tambahPeserta();
+          }
+        });
+      }
+
+      navigateTo('dashboard');
+    });
+  </script>
+</body>
+</html>

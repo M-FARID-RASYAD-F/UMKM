@@ -1,0 +1,638 @@
+<style>
+  /* ── Google Fonts: Inter & Plus Jakarta Sans ── */
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+  :root {
+    /* Brand Colors - Modern Indigo/Violet Palette */
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #eef2ff;
+    --primary-glow: rgba(79, 70, 229, 0.25);
+
+    /* Product Theming */
+    --pin-color: #f59e0b;
+    --pin-light: #fef3c7;
+    --pin-glow: rgba(245, 158, 11, 0.2);
+
+    --gk-color: #06b6d4;
+    --gk-light: #cffafe;
+    --gk-glow: rgba(6, 182, 212, 0.2);
+
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --warning: #f59e0b;
+
+    /* Neutrals & Surfaces */
+    --bg-page: #f8fafc;
+    --surface-card: #ffffff;
+    --surface-muted: #f1f5f9;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --border-subtle: #f1f5f9;
+
+    /* Radii & Shadows */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+    --radius-full: 9999px;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+    --shadow-glow: 0 8px 25px -4px var(--primary-glow);
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    padding-bottom: 90px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Numeric Font for Prices & Counters ── */
+  .font-mono-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── SPA Transitions ── */
+  .spa-view {
+    animation: fadeInView 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes fadeInView {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Modern Glassmorphism Navbar ── */
+  .pintrack-nav {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.2s ease;
+  }
+  .pintrack-nav .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 12px 18px;
+  }
+  .pintrack-nav .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 1.18rem;
+    color: var(--text-main);
+    text-decoration: none;
+    letter-spacing: -0.03em;
+    cursor: pointer;
+  }
+  .brand-badge {
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+  }
+  .pintrack-nav .nav-links {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-muted);
+    padding: 4px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .pintrack-nav .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .pintrack-nav .nav-links a:hover {
+    color: var(--primary);
+  }
+  .pintrack-nav .nav-links a.active {
+    background: #ffffff;
+    color: var(--primary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Compact nav links for small desktop / tablet landscape */
+  @media (max-width: 991px) and (min-width: 769px) {
+    .pintrack-nav .nav-links a {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      gap: 5px;
+    }
+  }
+
+  /* ── Layout Container ── */
+  .container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 18px;
+  }
+
+  /* ── Bento & Modern Cards ── */
+  .card {
+    background: var(--surface-card);
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 16px 20px !important;
+  }
+  .card-body {
+    padding: 20px !important;
+  }
+
+  /* ── Stat & KPI Bento Cards ── */
+  .stat-card {
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .stat-card:hover::before {
+    opacity: 1;
+  }
+  .stat-card.stat-pin::before { background: var(--pin-color); opacity: 1; }
+  .stat-card.stat-gk::before  { background: var(--gk-color); opacity: 1; }
+  .stat-card.stat-rev::before { background: var(--success); opacity: 1; }
+
+  .stat-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+
+  /* ── Counting Section Tabs ── */
+  .counting-tabs-nav {
+    display: flex;
+    background: #f1f5f9;
+    padding: 5px;
+    border-radius: var(--radius-lg);
+    gap: 6px;
+    border: 1px solid var(--border-color);
+  }
+  .counting-tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .counting-tab-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.5);
+  }
+  .counting-tab-btn.active {
+    background: #ffffff;
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  .counting-tab-btn.active.tab-custom-active {
+    color: #b45309;
+    border-bottom: 2px solid #f59e0b;
+  }
+  .counting-tab-btn.active.tab-reguler-active {
+    color: #4f46e5;
+    border-bottom: 2px solid #4f46e5;
+  }
+
+  /* ── POS Cashier Hero Cards ── */
+  .stok-hero-card {
+    border-radius: var(--radius-xl) !important;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .stok-hero-card.pin-theme {
+    border-color: #fde68a;
+    background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+  }
+  .stok-hero-card.gk-theme {
+    border-color: #a5f3fc;
+    background: linear-gradient(180deg, #ecfeff 0%, #ffffff 100%);
+  }
+  .stok-hero-card.border-warning {
+    border-color: var(--warning) !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+  }
+  .stok-hero-card.border-danger {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
+    animation: pulseBorder 1.5s infinite;
+  }
+  @keyframes pulseBorder {
+    0%, 100% { border-color: var(--danger); }
+    50% { border-color: #b91c1c; }
+  }
+
+  /* ── POS Stepper Buttons (48px Touch Target) ── */
+  .stepper-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md) !important;
+    transition: all 0.12s ease;
+    cursor: pointer;
+  }
+  .stepper-btn:active {
+    transform: scale(0.92);
+  }
+
+  .stepper-input {
+    height: 52px;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  /* ── Fast Preset Chips ── */
+  .preset-chip {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    color: var(--text-main);
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .preset-chip:hover {
+    background: var(--surface-muted);
+    border-color: #cbd5e1;
+  }
+  .preset-chip:active {
+    transform: scale(0.95);
+  }
+  .preset-chip.pin-chip {
+    border-color: #fde68a;
+    color: #b45309;
+    background: #fef3c7;
+  }
+  .preset-chip.gk-chip {
+    border-color: #a5f3fc;
+    color: #0e7490;
+    background: #cffafe;
+  }
+
+  /* ── POS Receipt Box ── */
+  .pos-receipt-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1.5px dashed #cbd5e1;
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    position: relative;
+  }
+
+  /* ── Big CTA Button ── */
+  .btn-pos-confirm {
+    height: 58px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    transition: all 0.15s ease;
+  }
+  .btn-pos-confirm:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+  }
+  .btn-pos-confirm:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  /* ── Form Controls ── */
+  .form-control, .form-select {
+    border-radius: var(--radius-md) !important;
+    border: 1.5px solid var(--border-color);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    transition: all 0.15s ease;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3.5px var(--primary-glow);
+  }
+  .input-group-text {
+    background: var(--surface-muted);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  /* ── Badges & Progress ── */
+  .badge {
+    padding: 5px 10px;
+    font-weight: 700;
+    border-radius: var(--radius-full) !important;
+    letter-spacing: 0.02em;
+  }
+  .progress {
+    background-color: #e2e8f0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  /* ── Tables ── */
+  .table {
+    margin-bottom: 0;
+    color: var(--text-main);
+  }
+  .table th {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
+  }
+  .table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .table-hover tbody tr:hover {
+    background-color: #f8fafc;
+  }
+
+  /* ── Toast ── */
+  .toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+  }
+  .toast {
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+  }
+
+  /* ── Mobile Optimization (≤ 768px) ── */
+  @media (max-width: 768px) {
+    body {
+      padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Disable backdrop-filter on the parent navbar so position: fixed on .nav-links works relative to viewport */
+    .pintrack-nav {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .pintrack-nav .nav-inner {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Floating bottom navigation bar */
+    .pintrack-nav .nav-links {
+      position: fixed;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      left: 12px;
+      right: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      z-index: 1050;
+      padding: 5px;
+      overflow: hidden;
+    }
+
+    .pintrack-nav .nav-links a {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 0.66rem;
+      font-weight: 600;
+      padding: 6px 2px;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.18s ease;
+      cursor: pointer;
+    }
+
+    .pintrack-nav .nav-links a i {
+      font-size: 1.18rem;
+      line-height: 1;
+    }
+
+    .pintrack-nav .nav-links a span {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      line-height: 1.1;
+    }
+
+    .pintrack-nav .nav-links a.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      box-shadow: none;
+    }
+
+    .pintrack-nav .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .stepper-btn { width: 46px; height: 46px; }
+    .stepper-input { height: 46px; font-size: 1.35rem !important; }
+  }
+
+  /* Extra compact for narrow mobile screens (e.g. Galaxy Fold, iPhone SE 1st gen) */
+  @media (max-width: 380px) {
+    .pintrack-nav .nav-links {
+      left: 8px;
+      right: 8px;
+      padding: 4px;
+      gap: 1px;
+    }
+    .pintrack-nav .nav-links a {
+      font-size: 0.62rem;
+      padding: 5px 1px;
+    }
+    .pintrack-nav .nav-links a i {
+      font-size: 1.1rem;
+    }
+  }
+
+  .min-h-tag {
+    min-height: 46px;
+    align-items: center;
+  }
+
+  /* ── Print & Save-to-PDF Optimizations ── */
+  @media print {
+    body {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      font-size: 10.5pt !important;
+    }
+
+    /* Sembunyikan navigasi, tombol kontrol, dan elemen UI layar */
+    .pintrack-nav,
+    .pintrack-nav .nav-links,
+    .toast-container,
+    .no-print,
+    .btn,
+    #rekapEventSelectorCard,
+    #rekapPdfCalloutCard,
+    #rekapPdfSuccessBox,
+    .modal {
+      display: none !important;
+    }
+
+    /* Pastikan hanya view rekap yang dicetak */
+    .spa-view {
+      display: none !important;
+    }
+    #view-rekap {
+      display: block !important;
+      animation: none !important;
+    }
+    #view-rekap .container {
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Tampilan Card di kertas cetak */
+    .card {
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: none !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      margin-bottom: 14px !important;
+      background: #ffffff !important;
+    }
+
+    .card-header {
+      background: #f8fafc !important;
+      border-bottom: 1px solid #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+
+    /* Pertahankan warna badge & kartu ringkasan saat print */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Tabel yang rapi dan tegas saat dicetak */
+    table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+    }
+    th, td {
+      border: 1px solid #cbd5e1 !important;
+      padding: 5px 8px !important;
+    }
+    thead th {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+  }
+</style>
+
+<!-- Bootstrap 5 CSS & Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
