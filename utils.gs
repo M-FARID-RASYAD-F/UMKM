@@ -10,11 +10,39 @@ function generateId() {
 }
 
 /**
+ * Parse string tanggal/timestamp (mendukung DD/MM/YYYY, ISO, atau Date object)
+ */
+function parseDateAny(val) {
+  if (!val) return null;
+  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+  var s = String(val).trim();
+  if (!s) return null;
+  var parts = s.split(' ');
+  var dParts = parts[0].split('/');
+  if (dParts.length === 3) {
+    var day   = parseInt(dParts[0], 10);
+    var month = parseInt(dParts[1], 10) - 1;
+    var year  = parseInt(dParts[2], 10);
+    var hour  = 0, min = 0, sec = 0;
+    if (parts[1]) {
+      var tParts = parts[1].split(':');
+      hour = parseInt(tParts[0], 10) || 0;
+      min  = parseInt(tParts[1], 10) || 0;
+      sec  = parseInt(tParts[2], 10) || 0;
+    }
+    return new Date(year, month, day, hour, min, sec);
+  }
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/**
  * Format tanggal ke DD/MM/YYYY
  */
 function formatDate(date) {
   if (!date) return '';
-  var d = new Date(date);
+  var d = parseDateAny(date);
+  if (!d) return '';
   var day   = String(d.getDate()).padStart(2, '0');
   var month = String(d.getMonth() + 1).padStart(2, '0');
   var year  = d.getFullYear();
@@ -26,7 +54,8 @@ function formatDate(date) {
  */
 function formatTimestamp(ts) {
   if (!ts) return '';
-  var d = new Date(ts);
+  var d = parseDateAny(ts);
+  if (!d) return '';
   return formatDate(d) + ' ' + 
     String(d.getHours()).padStart(2,'0') + ':' +
     String(d.getMinutes()).padStart(2,'0');
@@ -40,10 +69,18 @@ function formatRupiah(angka) {
 }
 
 /**
- * Ambil Spreadsheet
+ * Ambil Spreadsheet dan pastikan TimeZone disetel ke Asia/Jakarta (WIB)
  */
 function getSpreadsheet() {
-  return SpreadsheetApp.openById(SPREADSHEET_ID);
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  try {
+    if (ss.getSpreadsheetTimeZone() !== 'Asia/Jakarta') {
+      ss.setSpreadsheetTimeZone('Asia/Jakarta');
+    }
+  } catch(e) {
+    console.warn('Gagal set timezone spreadsheet: ' + e.message);
+  }
+  return ss;
 }
 
 /**

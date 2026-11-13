@@ -293,7 +293,9 @@ function getTodayTransaksi(eventId) {
   var today = new Date();
   today.setHours(0,0,0,0);
   return getTransaksiByEvent(eventId).filter(function(t) {
-    return new Date(t.timestamp) >= today;
+    if (!t.timestamp) return false;
+    var d = parseDateAny(t.timestamp);
+    return d && !isNaN(d.getTime()) && d >= today;
   });
 }
 
