@@ -1,90 +1,11 @@
 // ============================================================
-// rekap.gs — Kalkulasi Rekap & Export PDF
+// rekapLogic.gs — Kalkulasi Rekap, Auto-Sync RekapTemp & Export PDF
 // ============================================================
 
 /**
- * Hitung rekap lengkap per event
+ * Tulis / Sinkronkan data rekapitulasi lengkap ke sheet RekapTemp di Spreadsheet
  */
-function getRekapEvent(eventId) {
-  var event     = getEventById(eventId);
-  if (!event) return errorResponse('Event tidak ditemukan');
-
-  var transaksi = getTransaksiByEvent(eventId);
-
-  var totalQtyPin  = 0;
-  var totalQtyGk   = 0;
-  var totalHarga   = 0;
-  var jmlTransaksi = transaksi.length;
-
-  transaksi.forEach(function(t) {
-    totalQtyPin += Number(t.qty_pin) || 0;
-    totalQtyGk  += Number(t.qty_gk) || 0;
-    totalHarga  += Number(t.total_harga) || 0;
-  });
-
-  // Hitung modal & keuntungan
-  var modalPin         = Number(event.modal_pin) || 0;
-  var modalGk          = Number(event.modal_gk) || 0;
-  var totalModal       = (totalQtyPin * modalPin) + (totalQtyGk * modalGk);
-  var keuntunganBersih = totalHarga - totalModal;
-
-  // Parse peserta secara aman
-  var rawPeserta = event.peserta ? String(event.peserta) : '';
-  var daftarPeserta = rawPeserta
-    ? rawPeserta.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; })
-    : [];
-  var bagianPerOrang = daftarPeserta.length > 0 ? Math.round(keuntunganBersih / daftarPeserta.length) : 0;
-
-  return successResponse({
-    event            : event,
-    total_qty_pin    : totalQtyPin,
-    total_qty_gk     : totalQtyGk,
-    total_qty        : totalQtyPin + totalQtyGk,
-    total_harga      : totalHarga,
-    modal_pin        : modalPin,
-    modal_gk         : modalGk,
-    total_modal      : totalModal,
-    keuntungan_bersih: keuntunganBersih,
-    daftar_peserta   : daftarPeserta,
-    bagian_per_orang : bagianPerOrang,
-    jml_transaksi    : jmlTransaksi,
-    stok_awal_pin    : event.stok_awal_pin,
-    stok_awal_gk     : event.stok_awal_gk,
-    stok_sisa_pin    : event.stok_sisa_pin,
-    stok_sisa_gk     : event.stok_sisa_gk,
-    transaksi        : transaksi
-  });
-}
-
-/**
- * Generate data ke sheet RekapTemp lalu return URL PDF
- */
-function generatePdfUrl(eventId) {
-  var event     = getEventById(eventId);
-  if (!event) return errorResponse('Event tidak ditemukan');
-
-  var transaksi = getTransaksiByEvent(eventId);
-
-  // Hitung rekap
-  var totalQtyPin = 0, totalQtyGk = 0, totalHarga = 0;
-  transaksi.forEach(function(t) {
-    totalQtyPin += Number(t.qty_pin) || 0;
-    totalQtyGk  += Number(t.qty_gk) || 0;
-    totalHarga  += Number(t.total_harga) || 0;
-  });
-
-  // Hitung modal & keuntungan
-  var modalPin         = Number(event.modal_pin) || 0;
-  var modalGk          = Number(event.modal_gk) || 0;
-  var totalModal       = (totalQtyPin * modalPin) + (totalQtyGk * modalGk);
-  var keuntunganBersih = totalHarga - totalModal;
-  var rawPeserta       = event.peserta ? String(event.peserta) : '';
-  var daftarPeserta    = rawPeserta
-    ? rawPeserta.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; })
-    : [];
-  var bagianPerOrang   = daftarPeserta.length > 0 ? Math.round(keuntunganBersih / daftarPeserta.length) : 0;
-
-  // Tulis ke sheet RekapTemp
+function writeRekapTemp(event, transaksi, totalQtyPin, totalQtyGk, totalHarga, totalModal, keuntunganBersih, daftarPeserta, bagianPerOrang) {
   var ss    = getSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_REKAP_TEMP);
   if (!sheet) sheet = ss.insertSheet(SHEET_REKAP_TEMP);
@@ -93,10 +14,10 @@ function generatePdfUrl(eventId) {
   // ── Header Rekap ─────────────────────────────────────────
   sheet.getRange('A1').setValue('REKAP PENJUALAN EVENT - PinTrack');
   sheet.getRange('A1').setFontSize(14).setFontWeight('bold');
-  sheet.getRange('A2').setValue('Event     : ' + event.nama_event);
-  sheet.getRange('A3').setValue('Lokasi    : ' + event.lokasi);
-  sheet.getRange('A4').setValue('Tanggal   : ' + event.tanggal_mulai + ' s/d ' + event.tanggal_selesai);
-  sheet.getRange('A5').setValue('Dicetak   : ' + formatTimestamp(new Date()));
+  sheet.getRange('A2').setValue('Event         : ' + event.nama_event);
+  sheet.getRange('A3').setValue('Lokasi        : ' + (event.lokasi || '-'));
+  sheet.getRange('A4').setValue('Periode Event : ' + event.tanggal_mulai + ' s/d ' + event.tanggal_selesai);
+  sheet.getRange('A5').setValue('Disinkron     : ' + formatTimestamp(new Date()));
 
   // ── Ringkasan Penjualan ────────────────────────────────────
   sheet.getRange('A7').setValue('RINGKASAN PENJUALAN').setFontWeight('bold');
@@ -141,7 +62,7 @@ function generatePdfUrl(eventId) {
   }
 
   // ── Detail Transaksi ──────────────────────────────────────
-  sheet.getRange(nextRow, 1).setValue('DETAIL TRANSAKSI').setFontWeight('bold');
+  sheet.getRange(nextRow, 1).setValue('DETAIL TRANSAKSI (SEMUA TRANSAKSI EVENT)').setFontWeight('bold');
   nextRow++;
   var detailHeaders = [['No','Waktu','Produk','Qty Pin','Qty GK','Total Qty','Total Harga']];
   sheet.getRange(nextRow, 1, 1, 7).setValues(detailHeaders)
@@ -165,11 +86,85 @@ function generatePdfUrl(eventId) {
   // Auto resize kolom
   sheet.autoResizeColumns(1, 7);
 
-  // Paksa simpan perubahan spreadsheet sebelum URL diakses oleh user
+  // Paksa simpan perubahan spreadsheet
   SpreadsheetApp.flush();
+  return sheet;
+}
 
-  // ── Return URL PDF ────────────────────────────────────────
-  var gid    = sheet.getSheetId();
+/**
+ * Hitung rekap lengkap per event & otomatis sinkronkan ke sheet RekapTemp
+ */
+function getRekapEvent(eventId) {
+  var event = getEventById(eventId);
+  if (!event) return errorResponse('Event tidak ditemukan');
+
+  var transaksi = getTransaksiByEvent(eventId);
+
+  var totalQtyPin  = 0;
+  var totalQtyGk   = 0;
+  var totalHarga   = 0;
+  var jmlTransaksi = transaksi.length;
+
+  transaksi.forEach(function(t) {
+    totalQtyPin += Number(t.qty_pin) || 0;
+    totalQtyGk  += Number(t.qty_gk) || 0;
+    totalHarga  += Number(t.total_harga) || 0;
+  });
+
+  // Hitung modal & keuntungan
+  var modalPin         = Number(event.modal_pin) || 0;
+  var modalGk          = Number(event.modal_gk) || 0;
+  var totalModal       = (totalQtyPin * modalPin) + (totalQtyGk * modalGk);
+  var keuntunganBersih = totalHarga - totalModal;
+
+  // Parse peserta secara aman
+  var rawPeserta = event.peserta ? String(event.peserta) : '';
+  var daftarPeserta = rawPeserta
+    ? rawPeserta.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; })
+    : [];
+  var bagianPerOrang = daftarPeserta.length > 0 ? Math.round(keuntunganBersih / daftarPeserta.length) : 0;
+
+  // Otomatis sinkronkan data ke sheet RekapTemp di Google Sheets
+  try {
+    writeRekapTemp(event, transaksi, totalQtyPin, totalQtyGk, totalHarga, totalModal, keuntunganBersih, daftarPeserta, bagianPerOrang);
+  } catch(err) {
+    console.error('Auto-sync RekapTemp warning: ' + err.message);
+  }
+
+  return successResponse({
+    event            : event,
+    total_qty_pin    : totalQtyPin,
+    total_qty_gk     : totalQtyGk,
+    total_qty        : totalQtyPin + totalQtyGk,
+    total_harga      : totalHarga,
+    modal_pin        : modalPin,
+    modal_gk         : modalGk,
+    total_modal      : totalModal,
+    keuntungan_bersih: keuntunganBersih,
+    daftar_peserta   : daftarPeserta,
+    bagian_per_orang : bagianPerOrang,
+    jml_transaksi    : jmlTransaksi,
+    stok_awal_pin    : event.stok_awal_pin,
+    stok_awal_gk     : event.stok_awal_gk,
+    stok_sisa_pin    : event.stok_sisa_pin,
+    stok_sisa_gk     : event.stok_sisa_gk,
+    transaksi        : transaksi,
+    synced_at        : formatTimestamp(new Date())
+  });
+}
+
+/**
+ * Generate data ke sheet RekapTemp lalu return URL PDF
+ */
+function generatePdfUrl(eventId) {
+  var rekapRes = getRekapEvent(eventId);
+  var rekap = (typeof rekapRes === 'string') ? JSON.parse(rekapRes) : rekapRes;
+  if (!rekap || rekap.status !== 'ok') return errorResponse('Gagal mengolah data rekap untuk PDF');
+
+  var ss    = getSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_REKAP_TEMP);
+  var gid   = sheet ? sheet.getSheetId() : 0;
+
   var pdfUrl = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID
     + '/export?format=pdf'
     + '&gid=' + gid
@@ -185,5 +180,5 @@ function generatePdfUrl(eventId) {
     + '&left_margin=0.5'
     + '&right_margin=0.5';
 
-  return successResponse({ pdf_url: pdfUrl, event_nama: event.nama_event });
+  return successResponse({ pdf_url: pdfUrl, event_nama: rekap.data.event.nama_event });
 }

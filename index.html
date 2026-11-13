@@ -1019,11 +1019,21 @@
 
       <!-- Selector Event -->
       <div class="card mb-4" id="rekapEventSelectorCard">
-        <div class="card-body py-3">
-          <label class="form-label fw-bold small text-muted">Pilih Event untuk Melihat Laporan</label>
-          <select class="form-select fw-bold" id="rekapEventSelector" onchange="loadRekapData()">
-            <option value="">— Pilih event —</option>
-          </select>
+        <div class="card-body py-3 px-3 px-md-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+            <label class="form-label fw-bold small mb-0" style="color:var(--text-muted-warm);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;">Pilih Event untuk Melihat Laporan</label>
+            <span class="badge" id="rekapSyncBadge" style="background:#ecfdf5; color:#15803d; border:1px solid #bbf7d0; border-radius:999px; padding:5px 12px; font-weight:700; display:none;">
+              <i class="bi bi-cloud-check-fill me-1"></i>RekapTemp Tersinkronisasi Otomatis
+            </span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select fw-bold shadow-none" id="rekapEventSelector" onchange="loadRekapData()" style="cursor:pointer;">
+              <option value="">— Pilih event —</option>
+            </select>
+            <button type="button" class="btn-icon-warm flex-shrink-0" onclick="loadRekapData()" title="Segarkan & Sinkronkan Ulang ke RekapTemp" style="width:42px;height:42px;">
+              <i class="bi bi-arrow-clockwise fs-5"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2831,6 +2841,9 @@
       var errEl = document.getElementById('rekapErrorAlert');
       if (errEl) errEl.classList.add('d-none');
 
+      var syncBadge = document.getElementById('rekapSyncBadge');
+      if (syncBadge) syncBadge.style.display = 'none';
+
       if (!currentRekapEventId) {
         document.getElementById('rekapLoading').classList.add('d-none');
         document.getElementById('rekapPanel').classList.add('d-none');
@@ -2888,6 +2901,13 @@
 
       try {
         if (!d) return;
+
+        // Tampilkan badge auto-sync ke spreadsheet
+        var syncBadge = document.getElementById('rekapSyncBadge');
+        if (syncBadge) {
+          syncBadge.style.display = 'inline-flex';
+          syncBadge.title = 'Terakhir disinkronkan ke sheet RekapTemp: ' + (d.synced_at || 'Baru saja');
+        }
 
         // Tampilkan panel rekap terlebih dahulu
         document.getElementById('rekapPanel').classList.remove('d-none');
