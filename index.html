@@ -8,362 +8,355 @@
   <?!= include('styles'); ?>
 </head>
 <body>
-  <?!= include('navbar'); ?>
+  <div class="app-shell-container">
+    <?!= include('navbar'); ?>
 
-  <!-- ========================================== -->
-  <!-- VIEW 1: DASHBOARD (Fintrixity Dark Fintech)-->
-  <!-- ========================================== -->
-  <div id="view-dashboard" class="spa-view">
-    <div class="container py-4">
-
-      <!-- Top Overview Header -->
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <main class="app-main-area">
+      <!-- Topbar Header (NovaPay Minimalist Style) -->
+      <header class="app-topbar">
         <div>
-          <h2 class="fw-bold mb-1 text-white">Overview</h2>
-          <p class="text-muted small mb-0">Here is the summary of overall data</p>
+          <div class="topbar-greeting">Good Day, Emma / Kasir</div>
+          <h2 class="topbar-title" id="appMainGreetingTitle">Welcome to NovaPay</h2>
         </div>
-        <div class="d-flex align-items-center gap-2">
-          <!-- Dropdown filter -->
-          <div class="dropdown">
-            <button class="btn btn-sm btn-light border d-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-pill" type="button" id="dashPeriodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              <span id="dashPeriodLabel">Semua Event</span>
-              <i class="bi bi-chevron-down small"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow" aria-labelledby="dashPeriodDropdown">
-              <li><a class="dropdown-item active" href="javascript:void(0)" onclick="setDashFilter('all', 'Semua Event')">Semua Event</a></li>
-              <li><a class="dropdown-item" href="javascript:void(0)" onclick="setDashFilter('active', 'Event Berjalan')">Event Sedang Berjalan</a></li>
-              <li><a class="dropdown-item" href="javascript:void(0)" onclick="setDashFilter('completed', 'Event Selesai')">Event Selesai</a></li>
-            </ul>
+        <div class="topbar-right-controls">
+          <!-- Search Pill -->
+          <div class="topbar-search-pill">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" id="topbarGlobalSearch" placeholder="Search" oninput="handleGlobalSearch(this.value)">
           </div>
-
-          <!-- Reset Data / Refresh button -->
-          <button class="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-pill" onclick="loadDashboard()" title="Muat Ulang Data">
-            <i class="bi bi-arrow-clockwise"></i>
-            <span>Reset Data</span>
+          <!-- Notification Bell -->
+          <button class="topbar-icon-btn" title="Notifikasi" onclick="showToast('Sistem PinTrack aktif & siap transaksi', 'primary')">
+            <i class="bi bi-bell"></i>
+            <span class="topbar-dot-indicator"></span>
           </button>
-        </div>
-      </div>
-
-      <!-- Row 1: Top 3 Bento Stat Cards (Matching Fintrixity Screenshot) -->
-      <div class="row g-3 mb-4">
-        <!-- 1. Hero Radiant Orange Gradient Card (My balance) -->
-        <div class="col-12 col-md-4">
-          <div class="card card-bento-hero-orange h-100">
-            <div class="d-flex align-items-start justify-content-between mb-3">
-              <div class="d-flex align-items-center gap-2">
-                <div class="hero-card-icon-white">
-                  <i class="bi bi-wallet2"></i>
-                </div>
-                <div>
-                  <div class="hero-card-title">My balance</div>
-                  <div class="hero-card-subtitle">Wallet Overview &amp; Spending</div>
-                </div>
-              </div>
-              <button class="btn btn-link text-white p-0 text-decoration-none opacity-75" title="Menu" onclick="navigateTo('rekap')">
-                <i class="bi bi-three-dots"></i>
-              </button>
-            </div>
-
-            <div class="d-flex align-items-baseline gap-2 mb-3">
-              <div class="hero-card-amount font-mono-num" id="dashHeroBalance">Rp 28.520.300</div>
-              <span class="hero-card-badge">+1.5% <i class="bi bi-arrow-up"></i></span>
-            </div>
-
-            <div class="mt-auto pt-2 border-top border-white border-opacity-25 d-flex justify-content-between align-items-center">
-              <a href="javascript:void(0)" onclick="navigateTo('counting')" class="hero-card-link">
-                <span>See details</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-              <span class="small text-white opacity-75 font-mono-num" id="dashHeroEventStatus">Event Aktif</span>
-            </div>
+          <!-- User Avatar -->
+          <div class="topbar-user-avatar" title="Kasir / Admin" onclick="showInfoFeedbackModal()">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-img-circle">
           </div>
         </div>
+      </header>
 
-        <!-- 2. Dark Bento Card (Savings account / Sisa Stok Pin) -->
-        <div class="col-12 col-md-4">
-          <div class="card card-bento-dark h-100">
-            <div class="d-flex align-items-start justify-content-between mb-3">
-              <div class="d-flex align-items-center gap-2">
-                <div class="dark-card-icon-badge">
-                  <i class="bi bi-pin-angle-fill text-warning"></i>
-                </div>
-                <div>
-                  <div class="dark-card-title">Savings account</div>
-                  <div class="dark-card-subtitle">Steady Growth Savings (Stok PIN)</div>
-                </div>
-              </div>
-              <button class="btn btn-link text-muted p-0 text-decoration-none" title="Kelola Stok" onclick="navigateTo('planning')">
-                <i class="bi bi-three-dots"></i>
-              </button>
-            </div>
-
-            <div class="d-flex align-items-baseline gap-2 mb-3">
-              <div class="dark-card-amount font-mono-num" id="dashTotalPin">0</div>
-              <span class="dark-card-badge text-success"><i class="bi bi-arrow-up text-success"></i> +3.2%</span>
-            </div>
-
-            <div class="mt-auto pt-2 border-top border-dark d-flex justify-content-between align-items-center">
-              <a href="javascript:void(0)" onclick="navigateTo('planning')" class="dark-card-link">
-                <span>View summary</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-              <span class="small text-muted font-mono-num" id="dashPinStatus">Ready Stok</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Dark Bento Card (Investment portfolio / Sisa Stok GK) -->
-        <div class="col-12 col-md-4">
-          <div class="card card-bento-dark h-100">
-            <div class="d-flex align-items-start justify-content-between mb-3">
-              <div class="d-flex align-items-center gap-2">
-                <div class="dark-card-icon-badge">
-                  <i class="bi bi-key-fill text-info"></i>
-                </div>
-                <div>
-                  <div class="dark-card-title">Investment portfolio</div>
-                  <div class="dark-card-subtitle">Track Your Wealth Growth (Stok GK)</div>
+      <!-- ========================================== -->
+      <!-- VIEW 1: DASHBOARD (NovaPay Warm Minimalist)-->
+      <!-- ========================================== -->
+      <div id="view-dashboard" class="spa-view">
+        <div class="row g-3">
+          
+          <!-- LEFT SECTION (~68% width on desktop) -->
+          <div class="col-12 col-xl-8">
+            
+            <!-- ROW 1: 3 Quick Stat Cards (Card Transfers, External, Internal) -->
+            <div class="row g-3 mb-3">
+              <!-- Stat 1: Card Transfers (Stok PIN Ready) -->
+              <div class="col-12 col-md-4">
+                <div class="stat-card-novapay">
+                  <div class="stat-badge-peach">
+                    <i class="bi bi-credit-card-2-front"></i>
+                  </div>
+                  <div>
+                    <div class="stat-label-novapay">Card Transfers</div>
+                    <div class="stat-val-novapay font-mono-num" id="dashTotalPinDisplay">$4,820</div>
+                  </div>
                 </div>
               </div>
-              <button class="btn btn-link text-muted p-0 text-decoration-none" title="Rekap GK" onclick="navigateTo('rekap')">
-                <i class="bi bi-three-dots"></i>
-              </button>
+
+              <!-- Stat 2: External Transfers (Stok GK Ready) -->
+              <div class="col-12 col-md-4">
+                <div class="stat-card-novapay">
+                  <div class="stat-badge-peach">
+                    <i class="bi bi-bar-chart-fill"></i>
+                  </div>
+                  <div>
+                    <div class="stat-label-novapay">External Transfers</div>
+                    <div class="stat-val-novapay font-mono-num" id="dashTotalGkDisplay">$2,465</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stat 3: Internal Transfers (Event Aktif) -->
+              <div class="col-12 col-md-4">
+                <div class="stat-card-novapay">
+                  <div class="stat-badge-peach">
+                    <i class="bi bi-arrow-up-right-circle-fill"></i>
+                  </div>
+                  <div>
+                    <div class="stat-label-novapay">Internal Transfers</div>
+                    <div class="stat-val-novapay font-mono-num" id="dashEventAktifDisplay">$3,190</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="d-flex align-items-baseline gap-2 mb-3">
-              <div class="dark-card-amount font-mono-num" id="dashTotalGk">0</div>
-              <span class="dark-card-badge text-success"><i class="bi bi-arrow-up text-success"></i> +4.7%</span>
-            </div>
+            <!-- Hidden elements to keep existing data-bindings alive -->
+            <span id="dashTotalPin" class="d-none">0</span>
+            <span id="dashTotalGk" class="d-none">0</span>
+            <span id="dashTotalEvent" class="d-none">0</span>
+            <span id="dashEventAktif" class="d-none">0</span>
 
-            <div class="mt-auto pt-2 border-top border-dark d-flex justify-content-between align-items-center">
-              <a href="javascript:void(0)" onclick="navigateTo('rekap')" class="dark-card-link">
-                <span>Analyze performance</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-              <span class="small text-muted font-mono-num" id="dashGkStatus">Ready Stok</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Row 2: Middle Section (My Wallet & Cash Flow Chart) -->
-      <div class="row g-3 mb-4">
-        <!-- Left: My Wallet Card -->
-        <div class="col-12 col-lg-5">
-          <div class="card h-100 p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- ROW 2: Smart Banking Banner Card with Floating Tangerine Card -->
+            <div class="smart-pos-banner-card mb-3">
               <div>
-                <h5 class="fw-bold mb-0 text-white">My Wallet</h5>
-                <p class="small text-muted mb-0">Today 1 USD = 122.20 BDT • Stok Real-time</p>
+                <h3 class="smart-pos-title">Smart Banking for<br>Everyday Life</h3>
+                <p class="smart-pos-desc">
+                  Take control of your finances with seamless payments, instant transfers. Kelola stok pin &amp; gantungan kunci bazaar dengan hitungan diskon otomatis.
+                </p>
+                <button type="button" class="btn-espresso-pill" onclick="navigateTo('counting')">
+                  <span>Get Started</span>
+                  <i class="bi bi-arrow-right"></i>
+                </button>
               </div>
-              <button class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1" onclick="navigateTo('planning')">
-                <i class="bi bi-plus-lg"></i>
-                <span>Add New</span>
-              </button>
-            </div>
 
-            <!-- 4 Currency / Product Tiles Grid (2x2) -->
-            <div class="row g-2">
-              <!-- Tile 1: USD (PIN Ready) -->
-              <div class="col-6">
-                <div class="wallet-tile-card">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center gap-1">
-                      <span class="badge" style="background:#fef3c7; color:#b45309; font-size:0.65rem;">PIN</span>
-                      <span class="wallet-currency-code">USD</span>
-                    </div>
-                    <span class="wallet-status-dot-active">Active</span>
-                  </div>
-                  <div class="wallet-tile-amount font-mono-num" id="walletPinStock">650 pcs</div>
-                  <div class="wallet-tile-limit">Limit is $10k a month</div>
+              <!-- Floating 3D Tangerine Credit Card (Matching NovaPay Screenshot) -->
+              <div class="floating-tangerine-card">
+                <div class="tangerine-card-header">
+                  <span>NovaPay Platinum</span>
+                  <span class="tangerine-card-chip"></span>
                 </div>
-              </div>
-
-              <!-- Tile 2: EUR (GK Ready) -->
-              <div class="col-6">
-                <div class="wallet-tile-card">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center gap-1">
-                      <span class="badge" style="background:#cffafe; color:#0891b2; font-size:0.65rem;">GK</span>
-                      <span class="wallet-currency-code">EUR</span>
-                    </div>
-                    <span class="wallet-status-dot-active">Active</span>
-                  </div>
-                  <div class="wallet-tile-amount font-mono-num" id="walletGkStock">420 pcs</div>
-                  <div class="wallet-tile-limit">Limit is €8k a month</div>
-                </div>
-              </div>
-
-              <!-- Tile 3: AUD (Custom Order) -->
-              <div class="col-6">
-                <div class="wallet-tile-card">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center gap-1">
-                      <span class="badge" style="background:#e0e7ff; color:#4338ca; font-size:0.65rem;">CST</span>
-                      <span class="wallet-currency-code">AUD</span>
-                    </div>
-                    <span class="wallet-status-dot-active">Active</span>
-                  </div>
-                  <div class="wallet-tile-amount font-mono-num" id="walletCustomStock">38 order</div>
-                  <div class="wallet-tile-limit">Limit is $15k a month</div>
-                </div>
-              </div>
-
-              <!-- Tile 4: GBP (Terjual / Rekap) -->
-              <div class="col-6">
-                <div class="wallet-tile-card">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center gap-1">
-                      <span class="badge" style="background:#f1f5f9; color:#475569; font-size:0.65rem;">SOLD</span>
-                      <span class="wallet-currency-code">GBP</span>
-                    </div>
-                    <span class="wallet-status-dot-inactive">Inactive</span>
-                  </div>
-                  <div class="wallet-tile-amount font-mono-num" id="walletSoldStock">1,150 pcs</div>
-                  <div class="wallet-tile-limit">Limit is £7.5k a month</div>
+                <div class="tangerine-card-number">4582 7824 9145 6521</div>
+                <div class="tangerine-card-footer">
+                  <span>Emma Carter</span>
+                  <span>08/28</span>
                 </div>
               </div>
             </div>
 
-            <!-- Total Event Summary Bar -->
-            <div class="mt-3 p-2 rounded-3 d-flex justify-content-between align-items-center small" style="background: var(--surface-input); border: 1px solid var(--border-color);">
-              <span class="text-muted"><i class="bi bi-broadcast text-success me-1"></i>Event Aktif Berjalan:</span>
-              <span class="text-white fw-bold font-mono-num"><span id="dashEventAktif">0</span> / <span id="dashTotalEvent">0</span> Event</span>
+            <!-- ROW 3: Recent Transactions & Recent Transfers (Side by side) -->
+            <div class="row g-3">
+              <!-- Recent Transactions -->
+              <div class="col-12 col-md-6">
+                <div class="recent-mini-card">
+                  <div class="mini-card-title">Recent Transactions</div>
+                  
+                  <!-- Item 1: Shopping -->
+                  <div class="mini-tx-row">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="tx-icon-peach">
+                        <i class="bi bi-bag-check-fill"></i>
+                      </div>
+                      <div>
+                        <div class="tx-name">Shopping</div>
+                        <div class="tx-time">Today 13:22</div>
+                      </div>
+                    </div>
+                    <div class="tx-amount-neg">-$349</div>
+                  </div>
+
+                  <!-- Item 2: Movie -->
+                  <div class="mini-tx-row">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="tx-icon-peach">
+                        <i class="bi bi-film"></i>
+                      </div>
+                      <div>
+                        <div class="tx-name">Movie</div>
+                        <div class="tx-time">Today 10:32</div>
+                      </div>
+                    </div>
+                    <div class="tx-amount-neg">-$24</div>
+                  </div>
+
+                  <!-- Item 3: Pin Track Order -->
+                  <div class="mini-tx-row">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="tx-icon-peach">
+                        <i class="bi bi-pin-angle-fill"></i>
+                      </div>
+                      <div>
+                        <div class="tx-name">Pin Reguler (3 Pcs)</div>
+                        <div class="tx-time">Yesterday 18:40</div>
+                      </div>
+                    </div>
+                    <div class="tx-amount-pos">+Rp 10.000</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Transfers / Custom Orders -->
+              <div class="col-12 col-md-6">
+                <div class="recent-mini-card">
+                  <div class="mini-card-title">Recent Transfers</div>
+
+                  <!-- Item 1: Michael B. -->
+                  <div class="mini-tx-row">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="tx-avatar-circle">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Avatar">
+                      </div>
+                      <div>
+                        <div class="tx-name">Michael B.</div>
+                        <div class="tx-time">Today 13:22</div>
+                      </div>
+                    </div>
+                    <div class="tx-amount-pos">+$320</div>
+                  </div>
+
+                  <!-- Item 2: Sophia C. -->
+                  <div class="mini-tx-row">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="tx-avatar-circle">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" alt="Avatar">
+                      </div>
+                      <div>
+                        <div class="tx-name">Sophia C.</div>
+                        <div class="tx-time">Today 10:32</div>
+                      </div>
+                    </div>
+                    <div class="tx-amount-neg">-$125</div>
+                  </div>
+
+                  <!-- Item 3: Custom Pre-order -->
+                  <div class="mini-tx-row">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="tx-avatar-circle">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80" alt="Avatar">
+                      </div>
+                      <div>
+                        <div class="tx-name">Desain Custom Anime</div>
+                        <div class="tx-time">Yesterday 16:15</div>
+                      </div>
+                    </div>
+                    <div class="tx-amount-pos">+Rp 25.000</div>
+                  </div>
+                </div>
+              </div>
             </div>
+
           </div>
-        </div>
 
-        <!-- Right: Cash Flow Chart Card -->
-        <div class="col-12 col-lg-7">
-          <div class="cashflow-card h-100">
-            <div class="d-flex justify-content-between align-items-start mb-2">
+          <!-- RIGHT SECTION (~32% width on desktop) -->
+          <div class="col-12 col-xl-4 d-flex flex-column gap-3">
+            
+            <!-- Monthly Savings Card (Spline Curve Chart) -->
+            <div class="monthly-savings-card">
               <div>
-                <div class="small text-muted fw-semibold mb-1">Cash Flow</div>
-                <div class="h2 fw-bold text-white mb-0 font-mono-num" id="dashCashFlowBig">$540,323.45</div>
+                <div class="savings-card-title">Monthly Savings</div>
+                <div class="savings-card-amount font-mono-num" id="dashHeroBalance">$3,842.50</div>
+                
+                <!-- Period Tabs -->
+                <div class="savings-period-tabs">
+                  <span class="savings-period-tab" onclick="switchSavingsPeriod('Day')">Day</span>
+                  <span class="savings-period-tab" onclick="switchSavingsPeriod('Week')">Week</span>
+                  <span class="savings-period-tab active" onclick="switchSavingsPeriod('Month')">Month</span>
+                  <span class="savings-period-tab" onclick="switchSavingsPeriod('Year')">Year</span>
+                </div>
               </div>
-              <!-- Monthly / Yearly Switcher -->
-              <div class="cashflow-switch-group">
-                <button type="button" class="btn-cf-switch" id="btnCfMonthly" onclick="switchCashFlowMode('monthly')">Monthly</button>
-                <button type="button" class="btn-cf-switch active" id="btnCfYearly" onclick="switchCashFlowMode('yearly')">Yearly</button>
+
+              <!-- Spline Line Chart (Matching Screenshot with Mar highlighted) -->
+              <div class="spline-chart-wrap">
+                <svg viewBox="0 0 300 90" class="w-100" style="overflow:visible;">
+                  <defs>
+                    <linearGradient id="warmCurveGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#E26237" stop-opacity="0.22"/>
+                      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0,65 C 25,65 35,42 55,42 C 75,42 85,62 105,62 C 125,62 135,22 155,22 C 175,22 185,42 205,42 C 225,42 235,32 255,32 C 275,32 285,60 300,52 L 300,90 L 0,90 Z" fill="url(#warmCurveGrad)" />
+                  <path d="M 0,65 C 25,65 35,42 55,42 C 75,42 85,62 105,62 C 125,62 135,22 155,22 C 175,22 185,42 205,42 C 225,42 235,32 255,32 C 275,32 285,60 300,52" fill="none" stroke="#4A2E1B" stroke-width="2.5" stroke-linecap="round" />
+                  <!-- Highlighted active peak dot for Mar at x=155, y=22 -->
+                  <line x1="155" y1="26" x2="155" y2="90" stroke="#E26237" stroke-width="1.5" stroke-dasharray="3,3" />
+                  <circle cx="155" cy="22" r="5" fill="#E26237" stroke="#FFFFFF" stroke-width="2" />
+                </svg>
+
+                <!-- Month labels with Mar pill badge -->
+                <div class="chart-month-labels">
+                  <span>Jan</span>
+                  <span>Feb</span>
+                  <span class="active-month-pill">Mar</span>
+                  <span>Apr</span>
+                  <span>May</span>
+                  <span>Jun</span>
+                </div>
               </div>
             </div>
 
-            <!-- Pure CSS Bar Chart Canvas matching screenshot -->
-            <div class="chart-canvas-wrapper">
-              <!-- Floating Tooltip Card on Orange Bar -->
-              <div class="chart-floating-tooltip" id="chartTooltipBox">
-                <div class="tooltip-date-header" id="tooltipDateHeader">July 23, 2026</div>
-                <div class="tooltip-row">
-                  <span class="text-muted">Cashflow</span>
-                  <span class="tooltip-val-pos" id="tooltipCashflowVal">$33,847.00</span>
-                </div>
-                <div class="tooltip-row">
-                  <span class="text-muted">Inflow</span>
-                  <span class="tooltip-val-neg" id="tooltipInflowVal">-$7,456.00</span>
+            <!-- Savings Goal (Deep Mocha Brown Card matching Screenshot) -->
+            <div class="savings-goal-mocha-card">
+              <div>
+                <div class="goal-title-small">Savings Goal</div>
+                <div class="goal-name-big">Europe Vacation</div>
+                <div class="goal-amount-range">$4105-$5000</div>
+                <div class="goal-progress-bar">
+                  <div class="goal-progress-fill"></div>
                 </div>
               </div>
 
-              <!-- Bar Columns Grid -->
-              <div class="chart-grid-flex">
-                <!-- Bar 1: Jan -->
-                <div class="chart-col" onmouseenter="hoverChartBar('Jan', 22000, 4500)">
-                  <div class="chart-bar-dark" style="height: 48%;"></div>
-                  <span class="chart-x-label">Jan</span>
+              <!-- Circular Donut Gauge (82%) -->
+              <div class="donut-gauge-box">
+                <svg viewBox="0 0 36 36" class="w-100 h-100">
+                  <path stroke="rgba(255, 255, 255, 0.2)" stroke-width="4.5" fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path stroke="#FDECE2" stroke-width="4.5" stroke-dasharray="82, 100" stroke-linecap="round" fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span class="donut-gauge-text">82%</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FULL WIDTH BOTTOM: Daftar Seluruh Event & Transaksi Table -->
+          <div class="col-12 mt-3">
+            <div class="card-novapay p-0 overflow-hidden">
+              <div class="d-flex flex-wrap justify-content-between align-items-center p-3 border-bottom gap-2">
+                <div>
+                  <h5 class="fw-bold mb-0" style="color:var(--espresso-dark);">Daftar Event &amp; Transaksi</h5>
+                  <small style="color:var(--text-muted-warm);">Pantau jadwal event bazaar dan riwayat ketersediaan stok</small>
                 </div>
-                <!-- Bar 2: Feb -->
-                <div class="chart-col" onmouseenter="hoverChartBar('Feb', 28000, 5200)">
-                  <div class="chart-bar-dark" style="height: 60%;"></div>
-                  <span class="chart-x-label">Feb</span>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="topbar-search-pill d-flex" style="width:190px; padding:6px 14px;">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="dashTableSearch" placeholder="Search event..." oninput="filterDashboardTable(this.value)">
+                  </div>
+                  <button class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1 rounded-pill px-3" onclick="loadDashboard()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh</span>
+                  </button>
+                  <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="navigateTo('planning')">
+                    <i class="bi bi-plus-lg me-1"></i>Event Baru
+                  </button>
                 </div>
-                <!-- Bar 3: Mar (Highlighted Radiant Orange Bar in Screenshot) -->
-                <div class="chart-col" onmouseenter="hoverChartBar('Mar', 33847, -7456)">
-                  <div class="chart-bar-highlight-orange" style="height: 88%;"></div>
-                  <span class="chart-x-label">Mar</span>
+              </div>
+
+              <div class="p-0">
+                <div id="dashLoadingEvents" class="text-center py-5 text-muted">
+                  <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                  <span>Memuat data aktivitas event...</span>
                 </div>
-                <!-- Bar 4: Apr -->
-                <div class="chart-col" onmouseenter="hoverChartBar('Apr', 18000, 3100)">
-                  <div class="chart-bar-dark" style="height: 42%;"></div>
-                  <span class="chart-x-label">Apr</span>
+
+                <div id="dashEventListContainer" class="d-none">
+                  <div class="table-responsive">
+                    <table class="table-novapay align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th style="width: 40px;"><input type="checkbox" class="form-check-input" onclick="toggleAllTableChecks(this)"></th>
+                          <th>Activity / Event</th>
+                          <th>Order ID</th>
+                          <th>Jadwal Mulai</th>
+                          <th>Jadwal Selesai</th>
+                          <th>Sisa Stok</th>
+                          <th>Status</th>
+                          <th class="text-end">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody id="dashEventTableBody"></tbody>
+                    </table>
+                  </div>
                 </div>
-                <!-- Bar 5: May -->
-                <div class="chart-col" onmouseenter="hoverChartBar('May', 25000, 4800)">
-                  <div class="chart-bar-dark" style="height: 55%;"></div>
-                  <span class="chart-x-label">May</span>
-                </div>
-                <!-- Bar 6: Jun -->
-                <div class="chart-col" onmouseenter="hoverChartBar('Jun', 31000, 6200)">
-                  <div class="chart-bar-dark" style="height: 68%;"></div>
-                  <span class="chart-x-label">Jun</span>
-                </div>
-                <!-- Bar 7: Jul -->
-                <div class="chart-col" onmouseenter="hoverChartBar('Jul', 36000, 7100)">
-                  <div class="chart-bar-dark" style="height: 78%;"></div>
-                  <span class="chart-x-label">Jul</span>
+
+                <div id="dashEmptyEvents" class="d-none text-center py-5 text-muted">
+                  <i class="bi bi-calendar-x fs-1 text-secondary opacity-50"></i>
+                  <h6 class="mt-3 fw-bold" style="color:var(--espresso-dark);">Belum Ada Event Terdaftar</h6>
+                  <p class="small text-muted mb-3">Mulai buat perencanaan event dan tentukan alokasi stok produk.</p>
+                  <button class="btn btn-primary btn-sm rounded-pill px-3" onclick="navigateTo('planning')">
+                    + Buat Event Pertama
+                  </button>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
-
-      <!-- Row 3: Bottom Section (Recent Activities Table Card) -->
-      <div class="activities-table-card">
-        <div class="activities-card-header">
-          <div>
-            <h5 class="fw-bold text-white mb-0">Recent Activities</h5>
-            <small class="text-muted">Daftar transaksi dan seluruh jadwal event terdaftar</small>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="table-search-input-wrap">
-              <i class="bi bi-search text-muted small"></i>
-              <input type="text" id="dashTableSearch" placeholder="Search" oninput="filterDashboardTable(this.value)">
-            </div>
-            <button class="btn-table-filter" type="button" onclick="loadDashboard()">
-              <i class="bi bi-sliders"></i>
-              <span>Filter</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="card-body p-0">
-          <div id="dashLoadingEvents" class="text-center py-5 text-muted">
-            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
-            <span>Memuat aktivitas event...</span>
-          </div>
-
-          <div id="dashEventListContainer" class="d-none">
-            <div class="table-responsive">
-              <table class="table-fintech align-middle mb-0">
-                <thead>
-                  <tr>
-                    <th style="width: 40px;"><input type="checkbox" class="table-check" onclick="toggleAllTableChecks(this)"></th>
-                    <th>Activity</th>
-                    <th>Order ID</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th class="text-end">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="dashEventTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div id="dashEmptyEvents" class="d-none text-center py-5 text-muted">
-            <i class="bi bi-calendar-x fs-1 text-secondary opacity-50"></i>
-            <h6 class="mt-3 fw-bold text-white">Belum Ada Aktivitas Event Terdaftar</h6>
-            <p class="small text-muted mb-3">Mulai buat perencanaan event dan tentukan alokasi stok produk.</p>
-            <button class="btn btn-primary btn-sm rounded-pill px-3" onclick="navigateTo('planning')">
-              + Buat Event Pertama
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
 
   <!-- ========================================== -->
   <!-- VIEW 2: PLANNING                           -->
@@ -1366,6 +1359,9 @@
     </div>
   </div>
 
+    </main>
+  </div>
+
   <?!= include('toast'); ?>
 
   <!-- ========================================== -->
@@ -1401,17 +1397,17 @@
         if (sideEl) sideEl.classList.add('active');
       }
 
-      // Update Topbar Breadcrumbs
-      var breadcrumbMap = {
-        'dashboard': 'Dashboard',
-        'planning': 'Planning & Stok',
-        'counting': 'Kasir Counting',
-        'rekap': 'Rekap Hasil',
-        'settings': 'Pengaturan'
+      // Update Topbar Title (NovaPay Style)
+      var greetingMap = {
+        'dashboard': 'Welcome to NovaPay',
+        'planning': 'Planning & Alokasi Stok',
+        'counting': 'Kasir Counting POS',
+        'rekap': 'Rekapitulasi Penjualan',
+        'settings': 'Settings & Maintenance'
       };
-      var bcEl = document.getElementById('topbarBreadcrumbActive');
-      if (bcEl) {
-        bcEl.textContent = breadcrumbMap[viewName] || viewName;
+      var greetEl = document.getElementById('appMainGreetingTitle');
+      if (greetEl) {
+        greetEl.textContent = greetingMap[viewName] || 'Welcome to PinTrack';
       }
 
       // Hide mobile offcanvas if open
@@ -1492,33 +1488,28 @@
       var terjualGk    = Math.max(0, totalAwalGk - totalGk);
       var estOmzet     = (terjualPin + terjualGk) * 4000;
 
-      // Update Top Bento Cards
-      document.getElementById('dashTotalEvent').textContent = events.length;
-      document.getElementById('dashEventAktif').textContent = aktif.length;
-      document.getElementById('dashTotalPin').textContent   = totalPin.toLocaleString('id-ID');
-      document.getElementById('dashTotalGk').textContent    = totalGk.toLocaleString('id-ID');
+      // Update Top Stat Displays (NovaPay Layout)
+      var dPin = document.getElementById('dashTotalPinDisplay');
+      if (dPin) dPin.innerHTML = totalPin.toLocaleString('id-ID') + ' <small style="font-size:0.95rem; font-weight:600; color:var(--text-muted-warm);">pcs</small>';
+      var dGk = document.getElementById('dashTotalGkDisplay');
+      if (dGk) dGk.innerHTML = totalGk.toLocaleString('id-ID') + ' <small style="font-size:0.95rem; font-weight:600; color:var(--text-muted-warm);">pcs</small>';
+      var dEvt = document.getElementById('dashEventAktifDisplay');
+      if (dEvt) dEvt.innerHTML = aktif.length + ' <small style="font-size:0.95rem; font-weight:600; color:var(--text-muted-warm);">/ ' + events.length + ' Event</small>';
 
+      // Update bindings for hidden elements
+      var tEvt = document.getElementById('dashTotalEvent');
+      if (tEvt) tEvt.textContent = events.length;
+      var aEvt = document.getElementById('dashEventAktif');
+      if (aEvt) aEvt.textContent = aktif.length;
+      var tPin = document.getElementById('dashTotalPin');
+      if (tPin) tPin.textContent = totalPin;
+      var tGk = document.getElementById('dashTotalGk');
+      if (tGk) tGk.textContent = totalGk;
+
+      // Update Monthly Savings (Hero balance)
       var heroBalEl = document.getElementById('dashHeroBalance');
       if (heroBalEl) {
-        heroBalEl.textContent = estOmzet > 0 ? formatRp(estOmzet) : 'Rp 28.520.300';
-      }
-      var heroStatusEl = document.getElementById('dashHeroEventStatus');
-      if (heroStatusEl) {
-        heroStatusEl.textContent = aktif.length > 0 ? aktif.length + ' Event Aktif' : 'Semua Siap';
-      }
-
-      // Update My Wallet sub-cards
-      var wPin = document.getElementById('walletPinStock');
-      if (wPin) wPin.textContent = totalPin.toLocaleString('id-ID') + ' pcs';
-      var wGk = document.getElementById('walletGkStock');
-      if (wGk) wGk.textContent = totalGk.toLocaleString('id-ID') + ' pcs';
-      var wSold = document.getElementById('walletSoldStock');
-      if (wSold) wSold.textContent = (terjualPin + terjualGk).toLocaleString('id-ID') + ' pcs';
-
-      // Update Cash Flow card header
-      var cfEl = document.getElementById('dashCashFlowBig');
-      if (cfEl) {
-        cfEl.textContent = estOmzet > 0 ? formatRp(estOmzet * 1.5) : '$540,323.45';
+        heroBalEl.textContent = estOmzet > 0 ? formatRp(estOmzet) : '$3,842.50';
       }
 
       // Update Sidebar Planning Counter
@@ -1535,44 +1526,70 @@
       var tbody = document.getElementById('dashEventTableBody');
       tbody.innerHTML = events.map(function(e) {
         var statusBadge = e.status === 'aktif'
-          ? '<span class="badge-status-completed"><span class="status-dot-green"></span> Completed</span>'
+          ? '<span class="badge" style="background:#ecfdf5; color:#15803d; border-radius:9999px; font-weight:700;"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>Aktif</span>'
           : e.status === 'selesai'
-          ? '<span class="badge-status-completed"><span class="status-dot-gray"></span> Selesai</span>'
-          : '<span class="badge-status-completed"><span class="status-dot-amber"></span> Draft</span>';
+          ? '<span class="badge" style="background:#f1f5f9; color:#475569; border-radius:9999px; font-weight:700;">Selesai</span>'
+          : '<span class="badge" style="background:#fef3c7; color:#b45309; border-radius:9999px; font-weight:700;">Draft</span>';
 
         var totalStokSisa = (e.stok_sisa_pin || 0) + (e.stok_sisa_gk || 0);
 
         return '<tr>'
-          + '<td style="width: 40px;"><input type="checkbox" class="table-check"></td>'
+          + '<td style="width: 40px;"><input type="checkbox" class="form-check-input"></td>'
           + '<td>'
-          +   '<div class="d-flex align-items-center gap-3">'
-          +     '<div class="activity-icon-badge">'
-          +       '<i class="bi bi-calendar2-check-fill" style="color:#ff5722;"></i>'
+          +   '<div class="d-flex align-items-center gap-2">'
+          +     '<div class="stat-badge-peach mb-0" style="width:32px; height:32px; font-size:0.9rem; flex-shrink:0;">'
+          +       '<i class="bi bi-calendar-event"></i>'
           +     '</div>'
           +     '<div>'
-          +       '<div class="fw-bold text-white">' + escHtml(e.nama_event) + '</div>'
-          +       '<div class="small text-muted"><i class="bi bi-geo-alt me-1"></i>' + escHtml(e.lokasi || 'Booth Event') + '</div>'
+          +       '<div class="fw-bold" style="color:var(--espresso-dark);">' + escHtml(e.nama_event) + '</div>'
+          +       '<div class="small" style="color:var(--text-muted-warm); font-size:0.75rem;"><i class="bi bi-geo-alt me-1"></i>' + escHtml(e.lokasi || 'Booth Event') + '</div>'
           +     '</div>'
           +   '</div>'
           + '</td>'
-          + '<td><span class="font-mono-num text-muted small">' + escHtml(e.event_id || 'EVT_000076') + '</span></td>'
-          + '<td class="text-white small">' + e.tanggal_mulai + '</td>'
-          + '<td class="text-muted small">' + e.tanggal_selesai + '</td>'
+          + '<td><span class="font-mono-num small text-muted">' + escHtml(e.event_id || 'EVT_000076') + '</span></td>'
+          + '<td class="small fw-semibold" style="color:var(--espresso-dark);">' + e.tanggal_mulai + '</td>'
+          + '<td class="small" style="color:var(--text-muted-warm);">' + e.tanggal_selesai + '</td>'
           + '<td>'
-          +   '<div class="font-mono-num fw-bold text-white">' + totalStokSisa.toLocaleString('id-ID') + ' pcs</div>'
-          +   '<div class="small text-muted">PIN: ' + e.stok_sisa_pin + ' • GK: ' + e.stok_sisa_gk + '</div>'
+          +   '<div class="font-mono-num fw-bold" style="color:var(--espresso-dark);">' + totalStokSisa.toLocaleString('id-ID') + ' pcs</div>'
+          +   '<div class="small" style="color:var(--text-muted-warm); font-size:0.72rem;">PIN: ' + e.stok_sisa_pin + ' • GK: ' + e.stok_sisa_gk + '</div>'
           + '</td>'
           + '<td>' + statusBadge + '</td>'
           + '<td class="text-end">'
           +   '<div class="btn-group btn-group-sm">'
-          +     '<button onclick="navigateTo(\'counting\', \'' + e.event_id + '\')" class="btn btn-icon-action" title="Buka Kasir Counting"><i class="bi bi-cart3"></i></button>'
-          +     '<button onclick="navigateTo(\'rekap\', \'' + e.event_id + '\')" class="btn btn-icon-action" title="Lihat Rekap"><i class="bi bi-bar-chart"></i></button>'
-          +     '<button onclick="navigateTo(\'planning\', \'' + e.event_id + '\')" class="btn btn-icon-action" title="Edit Event"><i class="bi bi-pencil"></i></button>'
-          +     '<button onclick="hapusEventDash(\'' + e.event_id + '\')" class="btn btn-icon-action text-danger" title="Hapus"><i class="bi bi-trash"></i></button>'
+          +     '<button onclick="navigateTo(\'counting\', \'' + e.event_id + '\')" class="btn-icon-warm" title="Buka Kasir Counting"><i class="bi bi-cart3"></i></button>'
+          +     '<button onclick="navigateTo(\'rekap\', \'' + e.event_id + '\')" class="btn-icon-warm ms-1" title="Lihat Rekap"><i class="bi bi-bar-chart"></i></button>'
+          +     '<button onclick="navigateTo(\'planning\', \'' + e.event_id + '\')" class="btn-icon-warm ms-1" title="Edit Event"><i class="bi bi-pencil"></i></button>'
+          +     '<button onclick="hapusEventDash(\'' + e.event_id + '\')" class="btn-icon-warm ms-1 text-danger" title="Hapus"><i class="bi bi-trash"></i></button>'
           +   '</div>'
           + '</td>'
           + '</tr>';
       }).join('');
+    }
+
+    function switchSavingsPeriod(period) {
+      document.querySelectorAll('.savings-period-tab').forEach(function(el) {
+        el.classList.remove('active');
+        if (el.textContent.trim() === period) el.classList.add('active');
+      });
+      var amounts = {
+        'Day': '$145.20',
+        'Week': '$920.00',
+        'Month': '$3,842.50',
+        'Year': '$46,120.00'
+      };
+      var balEl = document.getElementById('dashHeroBalance');
+      if (balEl && amounts[period]) balEl.textContent = amounts[period];
+    }
+
+    function handleGlobalSearch(query) {
+      if (currentView !== 'dashboard') {
+        navigateTo('dashboard');
+      }
+      var tSearch = document.getElementById('dashTableSearch');
+      if (tSearch) {
+        tSearch.value = query;
+        filterDashboardTable(query);
+      }
     }
 
     function setDashFilter(filterType, label) {

@@ -1,45 +1,25 @@
 <!-- ========================================== -->
-<!-- 1. DESKTOP SIDEBAR (Sleek Dark Fintech)    -->
+<!-- 1. DESKTOP SIDEBAR (Crisp White Card)      -->
 <!-- ========================================== -->
 <aside class="app-sidebar d-none d-lg-flex" id="desktopSidebar">
-  <!-- Brand / Logo Header -->
+  <!-- Brand / Logo Header (Novapay Style) -->
   <div class="sidebar-brand">
-    <a href="javascript:void(0)" onclick="navigateTo('dashboard')" class="d-flex align-items-center gap-2 text-decoration-none">
-      <div class="brand-logo-icon">
-        <!-- Radiant Flame / Diamond polygon icon inspired by Fintrixity -->
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C8.5 7 4 9.5 4 15C4 19.4 7.6 23 12 23C16.4 23 20 19.4 20 15C20 11.5 17 8 14 5.5C14 7.5 12.5 9 10.5 9.5C12.5 7.5 13 4.5 12 2Z" fill="url(#flameGradSidebar)" />
-          <defs>
-            <linearGradient id="flameGradSidebar" x1="4" y1="2" x2="20" y2="23" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FF7A3D"/>
-              <stop offset="1" stop-color="#FF3815"/>
-            </linearGradient>
-          </defs>
-        </svg>
+    <a href="javascript:void(0)" onclick="navigateTo('dashboard')" class="text-decoration-none">
+      <div class="brand-logo-text">
+        <span>PinTrack</span><span class="brand-logo-accent">.</span>
+        <span class="brand-pos-pill">POS</span>
       </div>
-      <span class="brand-title">PinTrack</span>
-      <span class="brand-pos-badge">POS</span>
     </a>
   </div>
 
-  <!-- Search Box -->
-  <div class="sidebar-search-box">
-    <div class="sidebar-search-inner">
-      <i class="bi bi-search search-icon"></i>
-      <input type="text" id="sidebarSearchField" placeholder="Search" oninput="handleSidebarSearch(this.value)">
-      <span class="search-kbd-badge">⌘K</span>
-    </div>
-  </div>
-
-  <!-- Main Navigation Links -->
+  <!-- Navigation Menu Links -->
   <div class="sidebar-nav-section">
-    <div class="sidebar-group-title">MAIN</div>
     <a href="javascript:void(0)" onclick="navigateTo('dashboard')" id="sidebar-nav-dashboard" class="sidebar-link nav-link-dashboard active">
       <div class="link-icon-box"><i class="bi bi-grid-fill"></i></div>
       <span class="link-label">Dashboard</span>
     </a>
     <a href="javascript:void(0)" onclick="navigateTo('planning')" id="sidebar-nav-planning" class="sidebar-link nav-link-planning">
-      <div class="link-icon-box"><i class="bi bi-calendar-event-fill"></i></div>
+      <div class="link-icon-box"><i class="bi bi-calendar2-event-fill"></i></div>
       <span class="link-label">Planning & Stok</span>
       <span class="sidebar-pill-badge" id="sidebarCountPlanning">0</span>
     </a>
@@ -52,121 +32,47 @@
       <div class="link-icon-box"><i class="bi bi-receipt-cutoff"></i></div>
       <span class="link-label">Rekap Hasil</span>
     </a>
-
-    <div class="sidebar-group-title mt-3">FEATURES</div>
     <a href="javascript:void(0)" onclick="navigateTo('counting', 'custom')" id="sidebar-nav-custom" class="sidebar-link nav-link-custom">
       <div class="link-icon-box"><i class="bi bi-palette-fill"></i></div>
       <span class="link-label">Pesanan Custom</span>
-      <span class="sidebar-pill-badge" id="sidebarCountCustom">0</span>
     </a>
     <a href="javascript:void(0)" onclick="navigateTo('settings')" id="sidebar-nav-settings" class="sidebar-link nav-link-settings">
       <div class="link-icon-box"><i class="bi bi-gear-fill"></i></div>
-      <span class="link-label">Pengaturan</span>
+      <span class="link-label">Settings</span>
     </a>
     <a href="javascript:void(0)" onclick="showInfoFeedbackModal()" class="sidebar-link">
-      <div class="link-icon-box"><i class="bi bi-chat-heart-fill"></i></div>
-      <span class="link-label">Feedback & Info</span>
+      <div class="link-icon-box"><i class="bi bi-question-circle-fill"></i></div>
+      <span class="link-label">Support & Info</span>
     </a>
   </div>
 
-  <!-- Bottom Pro Banner (Matching the Fintrixity screenshot) -->
+  <!-- Bottom Promo Card (Matching the NovaPay "Upgrade to Premium" card) -->
   <div class="sidebar-pro-card">
-    <div class="d-flex align-items-center gap-1 mb-1">
-      <span class="pro-title">Upgrade Pro!</span>
-      <span class="pro-crown">👑</span>
-    </div>
-    <p class="pro-subtitle">Higher productivity with better organization</p>
-    <div class="d-flex align-items-center gap-2 mt-2">
-      <button type="button" class="btn-pro-action" onclick="navigateTo('counting')">Upgrade</button>
-      <a href="javascript:void(0)" onclick="navigateTo('settings')" class="pro-learn-link">Learn more</a>
-    </div>
+    <div class="pro-title">Upgrade to Premium</div>
+    <div class="small" style="color: var(--text-muted-warm); font-size: 0.73rem;">Kelola bazaar & stok lebih cepat</div>
+    <button type="button" class="btn-pro-action" onclick="navigateTo('counting')">Upgrade Now</button>
   </div>
 </aside>
 
 <!-- ========================================== -->
-<!-- 2. TOPBAR HEADER (Breadcrumb + Actions)    -->
+<!-- 2. MOBILE OFFCANVAS DRAWER                 -->
 <!-- ========================================== -->
-<header class="app-topbar">
-  <div class="topbar-container">
-    <!-- Left: Mobile Toggle & Breadcrumbs -->
-    <div class="topbar-left-side">
-      <!-- Hamburger Button (Mobile / Tablet) -->
-      <button class="topbar-btn-icon d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarOffcanvas" aria-controls="mobileSidebarOffcanvas">
-        <i class="bi bi-list fs-4"></i>
-      </button>
-
-      <!-- History Navigation Arrows (Desktop) -->
-      <div class="topbar-nav-arrows d-none d-sm-flex">
-        <button class="btn-history-arrow" onclick="history.back()" title="Kembali"><i class="bi bi-arrow-left"></i></button>
-        <button class="btn-history-arrow" onclick="history.forward()" title="Maju"><i class="bi bi-arrow-right"></i></button>
-      </div>
-
-      <!-- Breadcrumbs Path -->
-      <div class="topbar-breadcrumbs">
-        <span class="breadcrumb-brand">PinTrack</span>
-        <i class="bi bi-chevron-right breadcrumb-divider"></i>
-        <span class="breadcrumb-current-page" id="topbarBreadcrumbActive">Dashboard</span>
-      </div>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebarOffcanvas" style="background: var(--bg-canvas); border-radius: 0 24px 24px 0;">
+  <div class="offcanvas-header border-bottom pb-3">
+    <div class="brand-logo-text">
+      <span>PinTrack</span><span class="brand-logo-accent">.</span>
+      <span class="brand-pos-pill">POS</span>
     </div>
-
-    <!-- Right: Quick Action Icons & Profile Avatar & Share Button -->
-    <div class="topbar-right-side">
-      <button class="topbar-btn-icon" title="Bantuan & Petunjuk" onclick="showInfoFeedbackModal()">
-        <i class="bi bi-question-circle"></i>
-      </button>
-      <button class="topbar-btn-icon" title="Notifikasi Sistem" onclick="showToast('Sistem PinTrack aktif & online', 'primary')">
-        <i class="bi bi-envelope"></i>
-      </button>
-      <button class="topbar-btn-icon pos-relative" title="Peringatan Stok" onclick="navigateTo('counting')">
-        <i class="bi bi-bell"></i>
-        <span class="topbar-notification-dot"></span>
-      </button>
-
-      <!-- User Profile Avatar -->
-      <div class="topbar-user-avatar" title="Admin / Kasir">
-        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Admin Avatar" class="avatar-img-circle" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'bi bi-person-fill text-white\'></i>';">
-      </div>
-
-      <!-- Radiant Orange Pill Action Button (Share <) -->
-      <button class="btn-topbar-share" onclick="handleShareOrQuickAction()">
-        <span>Share</span>
-        <i class="bi bi-share-fill"></i>
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- ========================================== -->
-<!-- 3. MOBILE OFFCANVAS SIDEBAR                -->
-<!-- ========================================== -->
-<div class="offcanvas offcanvas-start mobile-sidebar-drawer" tabindex="-1" id="mobileSidebarOffcanvas" aria-labelledby="mobileSidebarLabel">
-  <div class="offcanvas-header border-bottom border-dark border-opacity-25 pb-3">
-    <div class="d-flex align-items-center gap-2" id="mobileSidebarLabel">
-      <div class="brand-logo-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C8.5 7 4 9.5 4 15C4 19.4 7.6 23 12 23C16.4 23 20 19.4 20 15C20 11.5 17 8 14 5.5C14 7.5 12.5 9 10.5 9.5C12.5 7.5 13 4.5 12 2Z" fill="url(#flameGradMobile)" />
-          <defs>
-            <linearGradient id="flameGradMobile" x1="4" y1="2" x2="20" y2="23" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FF7A3D"/>
-              <stop offset="1" stop-color="#FF3815"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-      <span class="brand-title">PinTrack</span>
-      <span class="brand-pos-badge">POS</span>
-    </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body p-3 d-flex flex-column justify-content-between">
     <div class="sidebar-nav-section">
-      <div class="sidebar-group-title">MENU UTAMA</div>
       <a href="javascript:void(0)" onclick="closeMobileDrawerAndNav('dashboard')" class="sidebar-link nav-link-dashboard active">
         <div class="link-icon-box"><i class="bi bi-grid-fill"></i></div>
         <span class="link-label">Dashboard</span>
       </a>
       <a href="javascript:void(0)" onclick="closeMobileDrawerAndNav('planning')" class="sidebar-link nav-link-planning">
-        <div class="link-icon-box"><i class="bi bi-calendar-event-fill"></i></div>
+        <div class="link-icon-box"><i class="bi bi-calendar2-event-fill"></i></div>
         <span class="link-label">Planning & Stok</span>
       </a>
       <a href="javascript:void(0)" onclick="closeMobileDrawerAndNav('counting')" class="sidebar-link nav-link-counting">
@@ -178,32 +84,25 @@
         <div class="link-icon-box"><i class="bi bi-receipt-cutoff"></i></div>
         <span class="link-label">Rekap Hasil</span>
       </a>
-
-      <div class="sidebar-group-title mt-3">FITUR TAMBAHAN</div>
       <a href="javascript:void(0)" onclick="closeMobileDrawerAndNav('counting', 'custom')" class="sidebar-link nav-link-custom">
         <div class="link-icon-box"><i class="bi bi-palette-fill"></i></div>
         <span class="link-label">Pesanan Custom</span>
       </a>
       <a href="javascript:void(0)" onclick="closeMobileDrawerAndNav('settings')" class="sidebar-link nav-link-settings">
         <div class="link-icon-box"><i class="bi bi-gear-fill"></i></div>
-        <span class="link-label">Pengaturan</span>
+        <span class="link-label">Settings</span>
       </a>
     </div>
 
-    <!-- Mobile Pro Card -->
     <div class="sidebar-pro-card mt-4">
-      <div class="d-flex align-items-center gap-1 mb-1">
-        <span class="pro-title">Upgrade Pro!</span>
-        <span class="pro-crown">👑</span>
-      </div>
-      <p class="pro-subtitle">Organisasi penjualan bazaar lebih rapi & cepat</p>
-      <button type="button" class="btn-pro-action w-100" onclick="closeMobileDrawerAndNav('counting')">Mulai Kasir</button>
+      <div class="pro-title">Upgrade to Premium</div>
+      <button type="button" class="btn-pro-action" onclick="closeMobileDrawerAndNav('counting')">Upgrade Now</button>
     </div>
   </div>
 </div>
 
 <!-- ========================================== -->
-<!-- 4. MOBILE BOTTOM NAVIGATION (≤ 991px)      -->
+<!-- 3. MOBILE BOTTOM NAVIGATION (≤ 991px)      -->
 <!-- ========================================== -->
 <nav class="pintrack-nav d-lg-none" id="mobileBottomNav">
   <div class="nav-links">
@@ -231,39 +130,40 @@
 </nav>
 
 <!-- ========================================== -->
-<!-- 5. FEEDBACK / INFO MODAL                   -->
+<!-- 4. FEEDBACK / INFO MODAL                   -->
 <!-- ========================================== -->
 <div class="modal fade" id="modalFeedbackInfo" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg" style="background:#16171b; border: 1px solid rgba(255,255,255,0.08)!important; border-radius: 20px;">
-      <div class="modal-header border-bottom border-dark border-opacity-25 pb-3">
-        <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2">
-          <i class="bi bi-fire text-danger" style="color:#ff5b26!important;"></i> PinTrack POS Pro
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom pb-3">
+        <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+          <span>PinTrack POS</span>
+          <span class="badge" style="background: var(--surface-peach); color: var(--primary);">Warm Edition</span>
         </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body text-secondary py-4">
-        <p class="text-white fw-semibold mb-2">Tema Terinspirasi dari Fintrixity Dark Fintech UI</p>
-        <p class="small text-muted mb-3">
+      <div class="modal-body py-3">
+        <p class="fw-semibold mb-2" style="color: var(--espresso-dark);">Desain Terinspirasi dari NovaPay Warm Minimalist UI</p>
+        <p class="small mb-3" style="color: var(--text-muted-warm);">
           Sistem manajemen penjualan event bazaar untuk produk <strong>Pin & Gantungan Kunci</strong> dengan perhitungan diskon otomatis, live counter stok ready, pesanan custom pre-order, dan ekspor rekap PDF.
         </p>
-        <div class="p-3 rounded-3" style="background:#111216; border: 1px solid rgba(255,255,255,0.05);">
-          <div class="d-flex justify-content-between small py-1 border-bottom border-dark">
-            <span class="text-muted">Desain Tema:</span>
-            <span class="text-white fw-bold">Dark Fintrixity Edition</span>
+        <div class="p-3 rounded-3" style="background: var(--surface-card); border: 1px solid rgba(74, 46, 27, 0.08);">
+          <div class="d-flex justify-content-between small py-1 border-bottom">
+            <span style="color: var(--text-muted-warm);">Tema Desain:</span>
+            <span class="fw-bold" style="color: var(--espresso-dark);">Warm Cream &amp; Espresso</span>
           </div>
-          <div class="d-flex justify-content-between small py-1 border-bottom border-dark">
-            <span class="text-muted">Aksen Warna:</span>
-            <span style="color:#ff5b26; font-weight:700;">Radiant Flame Orange (#FF5B26)</span>
+          <div class="d-flex justify-content-between small py-1 border-bottom">
+            <span style="color: var(--text-muted-warm);">Aksen Warna:</span>
+            <span style="color: var(--primary); font-weight: 700;">Tangerine &amp; Peach</span>
           </div>
           <div class="d-flex justify-content-between small py-1">
-            <span class="text-muted">Versi:</span>
-            <span class="text-white font-mono-num">v2.0 Pro</span>
+            <span style="color: var(--text-muted-warm);">Target:</span>
+            <span class="fw-bold" style="color: var(--espresso-dark);">Event &amp; Bazaar POS</span>
           </div>
         </div>
       </div>
-      <div class="modal-footer border-top border-dark border-opacity-25">
-        <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill" data-bs-dismiss="modal">Mengerti</button>
+      <div class="modal-footer border-top pt-2">
+        <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill" data-bs-dismiss="modal">Tutup</button>
       </div>
     </div>
   </div>
