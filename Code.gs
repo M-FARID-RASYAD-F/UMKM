@@ -3,6 +3,11 @@
 // ============================================================
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.fix_utc === '1') {
+    var fixedCount = fixUtcTimestamps();
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ok', fixed: fixedCount }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   var template = HtmlService.createTemplateFromFile('index');
   return template.evaluate()
     .setTitle('PinTrack — Event Sales')

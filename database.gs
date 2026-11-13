@@ -44,7 +44,46 @@ function setupDatabase() {
   // Jalankan migrasi struktur sheet Events bila ada penambahan kolom
   migrateEventsSheet();
 
+  // Sesuaikan timestamp lama yang tersimpan dalam UTC jika ada
+  fixUtcTimestamps();
+
   return successResponse('Setup selesai! Sheet Events, Transaksi, PesananKhusus, Pengaturan, dan RekapTemp berhasil disinkronkan.');
+}
+
+/**
+ * Sesuaikan timestamp transaksi lama yang sempat tercatat dalam waktu UTC (sebelum timezone diubah ke GMT+7)
+ */
+function fixUtcTimestamps() {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_TRANSAKSI);
+  if (!sheet) return 0;
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 0;
+
+  var range = sheet.getRange(2, 3, lastRow - 1, 1);
+  var values = range.getValues();
+  var count = 0;
+
+  for (var i = 0; i < values.length; i++) {
+    var val = values[i][0];
+    if (val) {
+      var d = parseDateAny(val);
+      if (d) {
+        var dateStr = formatDate(d);
+        if (dateStr === '10/11/2026' || dateStr === '12/11/2026') {
+          var adjusted = new Date(d.getTime() + (7 * 60 * 60 * 1000));
+          values[i][0] = adjusted;
+          count++;
+        }
+      }
+    }
+  }
+
+  if (count > 0) {
+    range.setValues(values);
+    SpreadsheetApp.flush();
+  }
+  return count;
 }
 
 /**
