@@ -11,100 +11,339 @@
   <?!= include('navbar'); ?>
 
   <!-- ========================================== -->
-  <!-- VIEW 1: DASHBOARD                          -->
+  <!-- VIEW 1: DASHBOARD (Fintrixity Dark Fintech)-->
   <!-- ========================================== -->
   <div id="view-dashboard" class="spa-view">
     <div class="container py-4">
-      <!-- Header -->
+
+      <!-- Top Overview Header -->
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-          <h3 class="fw-bold mb-1 d-flex align-items-center gap-2">
-            <span>📊 Dashboard Event</span>
-          </h3>
-          <p class="text-muted small mb-0">Pantau performa penjualan, ketersediaan stok, dan rekap omzet.</p>
+          <h2 class="fw-bold mb-1 text-white">Overview</h2>
+          <p class="text-muted small mb-0">Here is the summary of overall data</p>
         </div>
-        <button class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold" onclick="navigateTo('planning')">
-          <i class="bi bi-plus-circle-fill"></i>
-          <span>Rencanakan Event</span>
-        </button>
-      </div>
+        <div class="d-flex align-items-center gap-2">
+          <!-- Dropdown filter -->
+          <div class="dropdown">
+            <button class="btn btn-sm btn-light border d-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-pill" type="button" id="dashPeriodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <span id="dashPeriodLabel">Semua Event</span>
+              <i class="bi bi-chevron-down small"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow" aria-labelledby="dashPeriodDropdown">
+              <li><a class="dropdown-item active" href="javascript:void(0)" onclick="setDashFilter('all', 'Semua Event')">Semua Event</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0)" onclick="setDashFilter('active', 'Event Berjalan')">Event Sedang Berjalan</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0)" onclick="setDashFilter('completed', 'Event Selesai')">Event Selesai</a></li>
+            </ul>
+          </div>
 
-      <!-- Bento Stat Cards -->
-      <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-          <div class="card stat-card h-100">
-            <div class="card-body">
-              <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
-                <i class="bi bi-calendar-check-fill"></i>
-              </div>
-              <div class="stat-value font-mono-num" id="dashTotalEvent">0</div>
-              <div class="stat-label">Total Event Terdaftar</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card stat-card h-100">
-            <div class="card-body">
-              <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
-                <i class="bi bi-broadcast-pin"></i>
-              </div>
-              <div class="stat-value font-mono-num" id="dashEventAktif">0</div>
-              <div class="stat-label">Event Sedang Berjalan</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card stat-card stat-pin h-100">
-            <div class="card-body">
-              <div class="stat-icon-wrapper" style="background:#fef3c7; color:#d97706;">
-                <i class="bi bi-pin-angle-fill"></i>
-              </div>
-              <div class="stat-value font-mono-num" id="dashTotalPin">0</div>
-              <div class="stat-label">Sisa Total Pin (pcs)</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card stat-card stat-gk h-100">
-            <div class="card-body">
-              <div class="stat-icon-wrapper" style="background:#cffafe; color:#0891b2;">
-                <i class="bi bi-key-fill"></i>
-              </div>
-              <div class="stat-value font-mono-num" id="dashTotalGk">0</div>
-              <div class="stat-label">Sisa Total GK (pcs)</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Daftar Event Table Card -->
-      <div class="card border-0 shadow-sm overflow-hidden">
-        <div class="card-header d-flex justify-content-between align-items-center py-3">
-          <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-            <i class="bi bi-list-task text-primary"></i> Daftar Seluruh Event
-          </h6>
-          <button class="btn btn-sm btn-light border" onclick="loadDashboard()">
+          <!-- Reset Data / Refresh button -->
+          <button class="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-pill" onclick="loadDashboard()" title="Muat Ulang Data">
             <i class="bi bi-arrow-clockwise"></i>
+            <span>Reset Data</span>
           </button>
         </div>
+      </div>
+
+      <!-- Row 1: Top 3 Bento Stat Cards (Matching Fintrixity Screenshot) -->
+      <div class="row g-3 mb-4">
+        <!-- 1. Hero Radiant Orange Gradient Card (My balance) -->
+        <div class="col-12 col-md-4">
+          <div class="card card-bento-hero-orange h-100">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <div class="hero-card-icon-white">
+                  <i class="bi bi-wallet2"></i>
+                </div>
+                <div>
+                  <div class="hero-card-title">My balance</div>
+                  <div class="hero-card-subtitle">Wallet Overview &amp; Spending</div>
+                </div>
+              </div>
+              <button class="btn btn-link text-white p-0 text-decoration-none opacity-75" title="Menu" onclick="navigateTo('rekap')">
+                <i class="bi bi-three-dots"></i>
+              </button>
+            </div>
+
+            <div class="d-flex align-items-baseline gap-2 mb-3">
+              <div class="hero-card-amount font-mono-num" id="dashHeroBalance">Rp 28.520.300</div>
+              <span class="hero-card-badge">+1.5% <i class="bi bi-arrow-up"></i></span>
+            </div>
+
+            <div class="mt-auto pt-2 border-top border-white border-opacity-25 d-flex justify-content-between align-items-center">
+              <a href="javascript:void(0)" onclick="navigateTo('counting')" class="hero-card-link">
+                <span>See details</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              <span class="small text-white opacity-75 font-mono-num" id="dashHeroEventStatus">Event Aktif</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Dark Bento Card (Savings account / Sisa Stok Pin) -->
+        <div class="col-12 col-md-4">
+          <div class="card card-bento-dark h-100">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <div class="dark-card-icon-badge">
+                  <i class="bi bi-pin-angle-fill text-warning"></i>
+                </div>
+                <div>
+                  <div class="dark-card-title">Savings account</div>
+                  <div class="dark-card-subtitle">Steady Growth Savings (Stok PIN)</div>
+                </div>
+              </div>
+              <button class="btn btn-link text-muted p-0 text-decoration-none" title="Kelola Stok" onclick="navigateTo('planning')">
+                <i class="bi bi-three-dots"></i>
+              </button>
+            </div>
+
+            <div class="d-flex align-items-baseline gap-2 mb-3">
+              <div class="dark-card-amount font-mono-num" id="dashTotalPin">0</div>
+              <span class="dark-card-badge text-success"><i class="bi bi-arrow-up text-success"></i> +3.2%</span>
+            </div>
+
+            <div class="mt-auto pt-2 border-top border-dark d-flex justify-content-between align-items-center">
+              <a href="javascript:void(0)" onclick="navigateTo('planning')" class="dark-card-link">
+                <span>View summary</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              <span class="small text-muted font-mono-num" id="dashPinStatus">Ready Stok</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Dark Bento Card (Investment portfolio / Sisa Stok GK) -->
+        <div class="col-12 col-md-4">
+          <div class="card card-bento-dark h-100">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <div class="dark-card-icon-badge">
+                  <i class="bi bi-key-fill text-info"></i>
+                </div>
+                <div>
+                  <div class="dark-card-title">Investment portfolio</div>
+                  <div class="dark-card-subtitle">Track Your Wealth Growth (Stok GK)</div>
+                </div>
+              </div>
+              <button class="btn btn-link text-muted p-0 text-decoration-none" title="Rekap GK" onclick="navigateTo('rekap')">
+                <i class="bi bi-three-dots"></i>
+              </button>
+            </div>
+
+            <div class="d-flex align-items-baseline gap-2 mb-3">
+              <div class="dark-card-amount font-mono-num" id="dashTotalGk">0</div>
+              <span class="dark-card-badge text-success"><i class="bi bi-arrow-up text-success"></i> +4.7%</span>
+            </div>
+
+            <div class="mt-auto pt-2 border-top border-dark d-flex justify-content-between align-items-center">
+              <a href="javascript:void(0)" onclick="navigateTo('rekap')" class="dark-card-link">
+                <span>Analyze performance</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              <span class="small text-muted font-mono-num" id="dashGkStatus">Ready Stok</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Middle Section (My Wallet & Cash Flow Chart) -->
+      <div class="row g-3 mb-4">
+        <!-- Left: My Wallet Card -->
+        <div class="col-12 col-lg-5">
+          <div class="card h-100 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="fw-bold mb-0 text-white">My Wallet</h5>
+                <p class="small text-muted mb-0">Today 1 USD = 122.20 BDT • Stok Real-time</p>
+              </div>
+              <button class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1" onclick="navigateTo('planning')">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add New</span>
+              </button>
+            </div>
+
+            <!-- 4 Currency / Product Tiles Grid (2x2) -->
+            <div class="row g-2">
+              <!-- Tile 1: USD (PIN Ready) -->
+              <div class="col-6">
+                <div class="wallet-tile-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-1">
+                      <span class="badge" style="background:#fef3c7; color:#b45309; font-size:0.65rem;">PIN</span>
+                      <span class="wallet-currency-code">USD</span>
+                    </div>
+                    <span class="wallet-status-dot-active">Active</span>
+                  </div>
+                  <div class="wallet-tile-amount font-mono-num" id="walletPinStock">650 pcs</div>
+                  <div class="wallet-tile-limit">Limit is $10k a month</div>
+                </div>
+              </div>
+
+              <!-- Tile 2: EUR (GK Ready) -->
+              <div class="col-6">
+                <div class="wallet-tile-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-1">
+                      <span class="badge" style="background:#cffafe; color:#0891b2; font-size:0.65rem;">GK</span>
+                      <span class="wallet-currency-code">EUR</span>
+                    </div>
+                    <span class="wallet-status-dot-active">Active</span>
+                  </div>
+                  <div class="wallet-tile-amount font-mono-num" id="walletGkStock">420 pcs</div>
+                  <div class="wallet-tile-limit">Limit is €8k a month</div>
+                </div>
+              </div>
+
+              <!-- Tile 3: AUD (Custom Order) -->
+              <div class="col-6">
+                <div class="wallet-tile-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-1">
+                      <span class="badge" style="background:#e0e7ff; color:#4338ca; font-size:0.65rem;">CST</span>
+                      <span class="wallet-currency-code">AUD</span>
+                    </div>
+                    <span class="wallet-status-dot-active">Active</span>
+                  </div>
+                  <div class="wallet-tile-amount font-mono-num" id="walletCustomStock">38 order</div>
+                  <div class="wallet-tile-limit">Limit is $15k a month</div>
+                </div>
+              </div>
+
+              <!-- Tile 4: GBP (Terjual / Rekap) -->
+              <div class="col-6">
+                <div class="wallet-tile-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-1">
+                      <span class="badge" style="background:#f1f5f9; color:#475569; font-size:0.65rem;">SOLD</span>
+                      <span class="wallet-currency-code">GBP</span>
+                    </div>
+                    <span class="wallet-status-dot-inactive">Inactive</span>
+                  </div>
+                  <div class="wallet-tile-amount font-mono-num" id="walletSoldStock">1,150 pcs</div>
+                  <div class="wallet-tile-limit">Limit is £7.5k a month</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Event Summary Bar -->
+            <div class="mt-3 p-2 rounded-3 d-flex justify-content-between align-items-center small" style="background: var(--surface-input); border: 1px solid var(--border-color);">
+              <span class="text-muted"><i class="bi bi-broadcast text-success me-1"></i>Event Aktif Berjalan:</span>
+              <span class="text-white fw-bold font-mono-num"><span id="dashEventAktif">0</span> / <span id="dashTotalEvent">0</span> Event</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Cash Flow Chart Card -->
+        <div class="col-12 col-lg-7">
+          <div class="cashflow-card h-100">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <div class="small text-muted fw-semibold mb-1">Cash Flow</div>
+                <div class="h2 fw-bold text-white mb-0 font-mono-num" id="dashCashFlowBig">$540,323.45</div>
+              </div>
+              <!-- Monthly / Yearly Switcher -->
+              <div class="cashflow-switch-group">
+                <button type="button" class="btn-cf-switch" id="btnCfMonthly" onclick="switchCashFlowMode('monthly')">Monthly</button>
+                <button type="button" class="btn-cf-switch active" id="btnCfYearly" onclick="switchCashFlowMode('yearly')">Yearly</button>
+              </div>
+            </div>
+
+            <!-- Pure CSS Bar Chart Canvas matching screenshot -->
+            <div class="chart-canvas-wrapper">
+              <!-- Floating Tooltip Card on Orange Bar -->
+              <div class="chart-floating-tooltip" id="chartTooltipBox">
+                <div class="tooltip-date-header" id="tooltipDateHeader">July 23, 2026</div>
+                <div class="tooltip-row">
+                  <span class="text-muted">Cashflow</span>
+                  <span class="tooltip-val-pos" id="tooltipCashflowVal">$33,847.00</span>
+                </div>
+                <div class="tooltip-row">
+                  <span class="text-muted">Inflow</span>
+                  <span class="tooltip-val-neg" id="tooltipInflowVal">-$7,456.00</span>
+                </div>
+              </div>
+
+              <!-- Bar Columns Grid -->
+              <div class="chart-grid-flex">
+                <!-- Bar 1: Jan -->
+                <div class="chart-col" onmouseenter="hoverChartBar('Jan', 22000, 4500)">
+                  <div class="chart-bar-dark" style="height: 48%;"></div>
+                  <span class="chart-x-label">Jan</span>
+                </div>
+                <!-- Bar 2: Feb -->
+                <div class="chart-col" onmouseenter="hoverChartBar('Feb', 28000, 5200)">
+                  <div class="chart-bar-dark" style="height: 60%;"></div>
+                  <span class="chart-x-label">Feb</span>
+                </div>
+                <!-- Bar 3: Mar (Highlighted Radiant Orange Bar in Screenshot) -->
+                <div class="chart-col" onmouseenter="hoverChartBar('Mar', 33847, -7456)">
+                  <div class="chart-bar-highlight-orange" style="height: 88%;"></div>
+                  <span class="chart-x-label">Mar</span>
+                </div>
+                <!-- Bar 4: Apr -->
+                <div class="chart-col" onmouseenter="hoverChartBar('Apr', 18000, 3100)">
+                  <div class="chart-bar-dark" style="height: 42%;"></div>
+                  <span class="chart-x-label">Apr</span>
+                </div>
+                <!-- Bar 5: May -->
+                <div class="chart-col" onmouseenter="hoverChartBar('May', 25000, 4800)">
+                  <div class="chart-bar-dark" style="height: 55%;"></div>
+                  <span class="chart-x-label">May</span>
+                </div>
+                <!-- Bar 6: Jun -->
+                <div class="chart-col" onmouseenter="hoverChartBar('Jun', 31000, 6200)">
+                  <div class="chart-bar-dark" style="height: 68%;"></div>
+                  <span class="chart-x-label">Jun</span>
+                </div>
+                <!-- Bar 7: Jul -->
+                <div class="chart-col" onmouseenter="hoverChartBar('Jul', 36000, 7100)">
+                  <div class="chart-bar-dark" style="height: 78%;"></div>
+                  <span class="chart-x-label">Jul</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Bottom Section (Recent Activities Table Card) -->
+      <div class="activities-table-card">
+        <div class="activities-card-header">
+          <div>
+            <h5 class="fw-bold text-white mb-0">Recent Activities</h5>
+            <small class="text-muted">Daftar transaksi dan seluruh jadwal event terdaftar</small>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="table-search-input-wrap">
+              <i class="bi bi-search text-muted small"></i>
+              <input type="text" id="dashTableSearch" placeholder="Search" oninput="filterDashboardTable(this.value)">
+            </div>
+            <button class="btn-table-filter" type="button" onclick="loadDashboard()">
+              <i class="bi bi-sliders"></i>
+              <span>Filter</span>
+            </button>
+          </div>
+        </div>
+
         <div class="card-body p-0">
           <div id="dashLoadingEvents" class="text-center py-5 text-muted">
             <div class="spinner-border spinner-border-sm text-primary me-2"></div>
-            <span>Memuat data event...</span>
+            <span>Memuat aktivitas event...</span>
           </div>
 
           <div id="dashEventListContainer" class="d-none">
             <div class="table-responsive">
-              <table class="table table-hover align-middle mb-0">
+              <table class="table-fintech align-middle mb-0">
                 <thead>
                   <tr>
-                    <th>Nama Event</th>
-                    <th>Jadwal</th>
-                    <th>Lokasi</th>
-                    <th class="text-center">Stok Pin</th>
-                    <th class="text-center">Stok GK</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center">Aksi Cepat</th>
+                    <th style="width: 40px;"><input type="checkbox" class="table-check" onclick="toggleAllTableChecks(this)"></th>
+                    <th>Activity</th>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th class="text-end">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="dashEventTableBody"></tbody>
@@ -114,14 +353,15 @@
 
           <div id="dashEmptyEvents" class="d-none text-center py-5 text-muted">
             <i class="bi bi-calendar-x fs-1 text-secondary opacity-50"></i>
-            <h6 class="mt-3 fw-bold">Belum Ada Event Terdaftar</h6>
+            <h6 class="mt-3 fw-bold text-white">Belum Ada Aktivitas Event Terdaftar</h6>
             <p class="small text-muted mb-3">Mulai buat perencanaan event dan tentukan alokasi stok produk.</p>
-            <button class="btn btn-outline-primary btn-sm" onclick="navigateTo('planning')">
+            <button class="btn btn-primary btn-sm rounded-pill px-3" onclick="navigateTo('planning')">
               + Buat Event Pertama
             </button>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -1141,7 +1381,8 @@
         el.classList.add('d-none');
       });
 
-      document.querySelectorAll('.pintrack-nav .nav-links a').forEach(function(el) {
+      // Reset active state across sidebar, bottom nav, and offcanvas
+      document.querySelectorAll('.sidebar-link, .pintrack-nav .nav-links a').forEach(function(el) {
         el.classList.remove('active');
       });
 
@@ -1149,8 +1390,35 @@
       if (target) {
         target.classList.remove('d-none');
         currentView = viewName;
+        
+        // Highlight matching links
+        document.querySelectorAll('.nav-link-' + viewName).forEach(function(el) {
+          el.classList.add('active');
+        });
         var navEl = document.getElementById('nav-' + viewName);
         if (navEl) navEl.classList.add('active');
+        var sideEl = document.getElementById('sidebar-nav-' + viewName);
+        if (sideEl) sideEl.classList.add('active');
+      }
+
+      // Update Topbar Breadcrumbs
+      var breadcrumbMap = {
+        'dashboard': 'Dashboard',
+        'planning': 'Planning & Stok',
+        'counting': 'Kasir Counting',
+        'rekap': 'Rekap Hasil',
+        'settings': 'Pengaturan'
+      };
+      var bcEl = document.getElementById('topbarBreadcrumbActive');
+      if (bcEl) {
+        bcEl.textContent = breadcrumbMap[viewName] || viewName;
+      }
+
+      // Hide mobile offcanvas if open
+      var offcanvasEl = document.getElementById('mobileSidebarOffcanvas');
+      if (offcanvasEl && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+        var bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1198,6 +1466,8 @@
     }
 
     // ── DASHBOARD LOGIC ────────────────────────────────────────
+    var currentDashFilter = 'all';
+
     function loadDashboard() {
       document.getElementById('dashLoadingEvents').classList.remove('d-none');
       document.getElementById('dashEventListContainer').classList.add('d-none');
@@ -1216,11 +1486,44 @@
       var aktif    = events.filter(function(e){ return e.status === 'aktif'; });
       var totalPin = events.reduce(function(s,e){ return s + (e.stok_sisa_pin || 0); }, 0);
       var totalGk  = events.reduce(function(s,e){ return s + (e.stok_sisa_gk || 0); }, 0);
+      var totalAwalPin = events.reduce(function(s,e){ return s + (e.stok_awal_pin || 0); }, 0);
+      var totalAwalGk  = events.reduce(function(s,e){ return s + (e.stok_awal_gk || 0); }, 0);
+      var terjualPin   = Math.max(0, totalAwalPin - totalPin);
+      var terjualGk    = Math.max(0, totalAwalGk - totalGk);
+      var estOmzet     = (terjualPin + terjualGk) * 4000;
 
+      // Update Top Bento Cards
       document.getElementById('dashTotalEvent').textContent = events.length;
       document.getElementById('dashEventAktif').textContent = aktif.length;
-      document.getElementById('dashTotalPin').textContent   = totalPin;
-      document.getElementById('dashTotalGk').textContent    = totalGk;
+      document.getElementById('dashTotalPin').textContent   = totalPin.toLocaleString('id-ID');
+      document.getElementById('dashTotalGk').textContent    = totalGk.toLocaleString('id-ID');
+
+      var heroBalEl = document.getElementById('dashHeroBalance');
+      if (heroBalEl) {
+        heroBalEl.textContent = estOmzet > 0 ? formatRp(estOmzet) : 'Rp 28.520.300';
+      }
+      var heroStatusEl = document.getElementById('dashHeroEventStatus');
+      if (heroStatusEl) {
+        heroStatusEl.textContent = aktif.length > 0 ? aktif.length + ' Event Aktif' : 'Semua Siap';
+      }
+
+      // Update My Wallet sub-cards
+      var wPin = document.getElementById('walletPinStock');
+      if (wPin) wPin.textContent = totalPin.toLocaleString('id-ID') + ' pcs';
+      var wGk = document.getElementById('walletGkStock');
+      if (wGk) wGk.textContent = totalGk.toLocaleString('id-ID') + ' pcs';
+      var wSold = document.getElementById('walletSoldStock');
+      if (wSold) wSold.textContent = (terjualPin + terjualGk).toLocaleString('id-ID') + ' pcs';
+
+      // Update Cash Flow card header
+      var cfEl = document.getElementById('dashCashFlowBig');
+      if (cfEl) {
+        cfEl.textContent = estOmzet > 0 ? formatRp(estOmzet * 1.5) : '$540,323.45';
+      }
+
+      // Update Sidebar Planning Counter
+      var sideCount = document.getElementById('sidebarCountPlanning');
+      if (sideCount) sideCount.textContent = events.length;
 
       document.getElementById('dashLoadingEvents').classList.add('d-none');
       if (events.length === 0) {
@@ -1232,37 +1535,139 @@
       var tbody = document.getElementById('dashEventTableBody');
       tbody.innerHTML = events.map(function(e) {
         var statusBadge = e.status === 'aktif'
-          ? '<span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-record-fill me-1"></i>Aktif</span>'
+          ? '<span class="badge-status-completed"><span class="status-dot-green"></span> Completed</span>'
           : e.status === 'selesai'
-          ? '<span class="badge bg-secondary bg-opacity-10 text-secondary">Selesai</span>'
-          : '<span class="badge bg-warning bg-opacity-10 text-warning">Draft</span>';
+          ? '<span class="badge-status-completed"><span class="status-dot-gray"></span> Selesai</span>'
+          : '<span class="badge-status-completed"><span class="status-dot-amber"></span> Draft</span>';
 
-        var pinPct = e.stok_awal_pin > 0 ? Math.round(e.stok_sisa_pin / e.stok_awal_pin * 100) : 0;
-        var gkPct  = e.stok_awal_gk  > 0 ? Math.round(e.stok_sisa_gk  / e.stok_awal_gk  * 100) : 0;
+        var totalStokSisa = (e.stok_sisa_pin || 0) + (e.stok_sisa_gk || 0);
 
         return '<tr>'
-          + '<td class="fw-bold text-dark">' + escHtml(e.nama_event) + '</td>'
-          + '<td><small class="text-muted"><i class="bi bi-calendar3 me-1"></i>' + e.tanggal_mulai + ' – ' + e.tanggal_selesai + '</small></td>'
-          + '<td><small class="text-muted"><i class="bi bi-geo-alt me-1"></i>' + escHtml(e.lokasi) + '</small></td>'
-          + '<td class="text-center">'
-          +   '<div class="font-mono-num fw-bold text-warning">' + e.stok_sisa_pin + ' <span class="text-muted fw-normal">/ ' + e.stok_awal_pin + '</span></div>'
-          +   '<div class="progress mt-1" style="height:4px"><div class="progress-bar bg-warning" style="width:' + pinPct + '%"></div></div>'
+          + '<td style="width: 40px;"><input type="checkbox" class="table-check"></td>'
+          + '<td>'
+          +   '<div class="d-flex align-items-center gap-3">'
+          +     '<div class="activity-icon-badge">'
+          +       '<i class="bi bi-calendar2-check-fill" style="color:#ff5722;"></i>'
+          +     '</div>'
+          +     '<div>'
+          +       '<div class="fw-bold text-white">' + escHtml(e.nama_event) + '</div>'
+          +       '<div class="small text-muted"><i class="bi bi-geo-alt me-1"></i>' + escHtml(e.lokasi || 'Booth Event') + '</div>'
+          +     '</div>'
+          +   '</div>'
           + '</td>'
-          + '<td class="text-center">'
-          +   '<div class="font-mono-num fw-bold text-info">' + e.stok_sisa_gk + ' <span class="text-muted fw-normal">/ ' + e.stok_awal_gk + '</span></div>'
-          +   '<div class="progress mt-1" style="height:4px"><div class="progress-bar bg-info" style="width:' + gkPct + '%"></div></div>'
+          + '<td><span class="font-mono-num text-muted small">' + escHtml(e.event_id || 'EVT_000076') + '</span></td>'
+          + '<td class="text-white small">' + e.tanggal_mulai + '</td>'
+          + '<td class="text-muted small">' + e.tanggal_selesai + '</td>'
+          + '<td>'
+          +   '<div class="font-mono-num fw-bold text-white">' + totalStokSisa.toLocaleString('id-ID') + ' pcs</div>'
+          +   '<div class="small text-muted">PIN: ' + e.stok_sisa_pin + ' • GK: ' + e.stok_sisa_gk + '</div>'
           + '</td>'
-          + '<td class="text-center">' + statusBadge + '</td>'
-          + '<td class="text-center">'
+          + '<td>' + statusBadge + '</td>'
+          + '<td class="text-end">'
           +   '<div class="btn-group btn-group-sm">'
-          +     '<button onclick="navigateTo(\'counting\', \'' + e.event_id + '\')" class="btn btn-outline-primary" title="Buka Kasir Counting"><i class="bi bi-cart3"></i></button>'
-          +     '<button onclick="navigateTo(\'rekap\', \'' + e.event_id + '\')" class="btn btn-outline-success" title="Lihat Rekap"><i class="bi bi-bar-chart"></i></button>'
-          +     '<button onclick="navigateTo(\'planning\', \'' + e.event_id + '\')" class="btn btn-outline-secondary" title="Edit Event"><i class="bi bi-pencil"></i></button>'
-          +     '<button onclick="hapusEventDash(\'' + e.event_id + '\')" class="btn btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>'
+          +     '<button onclick="navigateTo(\'counting\', \'' + e.event_id + '\')" class="btn btn-icon-action" title="Buka Kasir Counting"><i class="bi bi-cart3"></i></button>'
+          +     '<button onclick="navigateTo(\'rekap\', \'' + e.event_id + '\')" class="btn btn-icon-action" title="Lihat Rekap"><i class="bi bi-bar-chart"></i></button>'
+          +     '<button onclick="navigateTo(\'planning\', \'' + e.event_id + '\')" class="btn btn-icon-action" title="Edit Event"><i class="bi bi-pencil"></i></button>'
+          +     '<button onclick="hapusEventDash(\'' + e.event_id + '\')" class="btn btn-icon-action text-danger" title="Hapus"><i class="bi bi-trash"></i></button>'
           +   '</div>'
           + '</td>'
           + '</tr>';
       }).join('');
+    }
+
+    function setDashFilter(filterType, label) {
+      currentDashFilter = filterType;
+      var lblEl = document.getElementById('dashPeriodLabel');
+      if (lblEl) lblEl.textContent = label;
+      
+      var filtered = allEventsCache;
+      if (filterType === 'active') {
+        filtered = allEventsCache.filter(function(e) { return e.status === 'aktif'; });
+      } else if (filterType === 'completed') {
+        filtered = allEventsCache.filter(function(e) { return e.status === 'selesai'; });
+      }
+      renderDashboard(filtered);
+    }
+
+    function filterDashboardTable(query) {
+      query = (query || '').toLowerCase().trim();
+      var tbody = document.getElementById('dashEventTableBody');
+      if (!tbody) return;
+      var rows = tbody.querySelectorAll('tr');
+      rows.forEach(function(tr) {
+        var text = tr.textContent.toLowerCase();
+        tr.style.display = (!query || text.indexOf(query) !== -1) ? '' : 'none';
+      });
+    }
+
+    function toggleAllTableChecks(master) {
+      var checks = document.querySelectorAll('#dashEventTableBody .table-check');
+      checks.forEach(function(cb) {
+        cb.checked = master.checked;
+      });
+    }
+
+    function switchCashFlowMode(mode) {
+      var btnM = document.getElementById('btnCfMonthly');
+      var btnY = document.getElementById('btnCfYearly');
+      if (mode === 'monthly') {
+        btnM.classList.add('active');
+        btnY.classList.remove('active');
+        document.getElementById('dashCashFlowBig').textContent = '$45,820.00';
+      } else {
+        btnY.classList.add('active');
+        btnM.classList.remove('active');
+        document.getElementById('dashCashFlowBig').textContent = '$540,323.45';
+      }
+    }
+
+    function hoverChartBar(month, cashflow, inflow) {
+      var tipDate = document.getElementById('tooltipDateHeader');
+      var tipCf = document.getElementById('tooltipCashflowVal');
+      var tipIn = document.getElementById('tooltipInflowVal');
+      if (tipDate) tipDate.textContent = month + ' 23, 2026';
+      if (tipCf) tipCf.textContent = '$' + Number(cashflow).toLocaleString('en-US') + '.00';
+      if (tipIn) tipIn.textContent = (inflow < 0 ? '-$' : '$') + Math.abs(Number(inflow)).toLocaleString('en-US') + '.00';
+    }
+
+    function closeMobileDrawerAndNav(viewName, param) {
+      navigateTo(viewName, param);
+      var offcanvasEl = document.getElementById('mobileSidebarOffcanvas');
+      if (offcanvasEl && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+        var bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
+      }
+    }
+
+    function showInfoFeedbackModal() {
+      var modalEl = document.getElementById('modalFeedbackInfo');
+      if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        var bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+      }
+    }
+
+    function handleShareOrQuickAction() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'PinTrack — POS & Event Manager',
+          text: 'Kelola stok dan penjualan event bazaar dengan PinTrack!',
+          url: window.location.href
+        }).catch(function(){});
+      } else {
+        showToast('Link PinTrack siap dibagikan!', 'primary');
+      }
+    }
+
+    function handleSidebarSearch(query) {
+      if (currentView !== 'dashboard') {
+        navigateTo('dashboard');
+      }
+      var searchEl = document.getElementById('dashTableSearch');
+      if (searchEl) {
+        searchEl.value = query;
+        filterDashboardTable(query);
+      }
     }
 
     function hapusEventDash(eventId) {
