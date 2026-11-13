@@ -87,6 +87,58 @@ function fixUtcTimestamps() {
 }
 
 /**
+ * Hapus seluruh data transaksi pengetesan,
+ * kembalikan stok sisa event ke stok awal,
+ * dan kosongkan RekapTemp & PesananKhusus (Event tetap dipertahankan).
+ */
+function resetTestData() {
+  var ss = getSpreadsheet();
+  
+  // 1. Kosongkan sheet Transaksi (hapus baris 2 ke bawah)
+  var transSheet = ss.getSheetByName(SHEET_TRANSAKSI);
+  if (transSheet && transSheet.getLastRow() > 1) {
+    transSheet.deleteRows(2, transSheet.getLastRow() - 1);
+  }
+
+  // 2. Kosongkan sheet PesananKhusus (hapus baris 2 ke bawah jika ada)
+  var pesananSheet = ss.getSheetByName(SHEET_PESANAN_KHUSUS);
+  if (pesananSheet && pesananSheet.getLastRow() > 1) {
+    pesananSheet.deleteRows(2, pesananSheet.getLastRow() - 1);
+  }
+
+  // 3. Reset stok_sisa di sheet Events kembali sama dengan stok_awal
+  var eventsSheet = ss.getSheetByName(SHEET_EVENTS);
+  if (eventsSheet && eventsSheet.getLastRow() > 1) {
+    var numRows = eventsSheet.getLastRow() - 1;
+    var lastCol = Math.max(eventsSheet.getLastColumn(), HEADERS_EVENTS.length);
+    var dataRange = eventsSheet.getRange(2, 1, numRows, lastCol);
+    var eventsData = dataRange.getValues();
+    for (var i = 0; i < eventsData.length; i++) {
+      var stokAwalPin = Number(eventsData[i][5]) || 0;
+      var stokAwalGk  = Number(eventsData[i][6]) || 0;
+      eventsData[i][7] = stokAwalPin; // kolom 8: stok_sisa_pin
+      eventsData[i][8] = stokAwalGk;  // kolom 9: stok_sisa_gk
+    }
+    dataRange.setValues(eventsData);
+  }
+
+  // 4. Bersihkan sheet RekapTemp
+  var rekapSheet = ss.getSheetByName(SHEET_REKAP_TEMP);
+  if (rekapSheet) {
+    rekapSheet.clear();
+    rekapSheet.getRange(1, 1, 1, HEADERS_REKAP_TEMP.length).setValues([HEADERS_REKAP_TEMP]);
+    rekapSheet.getRange(1, 1, 1, HEADERS_REKAP_TEMP.length)
+      .setBackground('#1a73e8')
+      .setFontColor('#ffffff')
+      .setFontWeight('bold');
+    rekapSheet.setFrozenRows(1);
+  }
+
+  SpreadsheetApp.flush();
+  return 'Berhasil! Seluruh data transaksi pengetesan telah dihapus. Stok sisa event telah dikembalikan penuh ke stok awal (200 Pin & 200 GK).';
+}
+
+/**
  * Migrasi otomatis skema sheet Events jika belum memiliki kolom modal_pin, modal_gk, peserta
  */
 function migrateEventsSheet() {

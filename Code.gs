@@ -3,6 +3,11 @@
 // ============================================================
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.reset_test === '1') {
+    var resetMsg = resetTestData();
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ok', message: resetMsg }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   if (e && e.parameter && e.parameter.fix_utc === '1') {
     var fixedCount = fixUtcTimestamps();
     return ContentService.createTextOutput(JSON.stringify({ status: 'ok', fixed: fixedCount }))
@@ -113,4 +118,8 @@ function apiUpdateStatusPesananCustom(pesananId, statusPesanan, statusPembayaran
 
 function apiDeletePesananCustom(pesananId) {
   return deletePesananCustom(pesananId);
+}
+
+function apiResetTestData() {
+  return resetTestData();
 }
