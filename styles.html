@@ -871,14 +871,21 @@
   }
 
   /* ============================================================ */
-  /* POS COUNTING COMPONENTS (Warm Aesthetic)                     */
+  /* POS COUNTING COMPONENTS (Warm Minimalist NovaPay Aesthetic)  */
   /* ============================================================ */
+  .counting-view-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
   .counting-tabs-nav {
     display: flex;
-    background: rgba(74, 46, 27, 0.05);
+    background: #ede4db;
     padding: 5px;
     border-radius: var(--radius-pill);
     gap: 6px;
+    border: 1px solid rgba(74, 46, 27, 0.06);
   }
   .counting-tab-btn {
     flex: 1;
@@ -896,10 +903,13 @@
     gap: 8px;
     cursor: pointer;
   }
+  .counting-tab-btn:hover {
+    color: var(--espresso-dark);
+  }
   .counting-tab-btn.active {
     background: #ffffff;
     color: var(--espresso-dark);
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 4px 14px rgba(74, 46, 27, 0.08);
   }
   .counting-tab-btn.active.tab-reguler-active {
     color: var(--primary);
@@ -908,7 +918,226 @@
     color: #f59e0b;
   }
 
-  /* Stepper Buttons */
+  /* POS Stock Hero Cards */
+  .stok-hero-card {
+    border-radius: var(--radius-card) !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(74, 46, 27, 0.07) !important;
+    box-shadow: var(--shadow-card) !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .stok-hero-card.pin-theme {
+    border-top: 4px solid #f59e0b !important;
+  }
+  .stok-hero-card.gk-theme {
+    border-top: 4px solid #06b6d4 !important;
+  }
+  .stok-hero-card.border-warning {
+    border-color: #f59e0b !important;
+    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.22) !important;
+  }
+  .stok-hero-card.border-danger {
+    border-color: #ef4444 !important;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.28) !important;
+    animation: pulseBorder 1.5s infinite;
+  }
+  @keyframes pulseBorder {
+    0%, 100% { border-color: #ef4444; }
+    50% { border-color: #b91c1c; }
+  }
+
+  /* Segmented POS Selector (Pill Group) */
+  .segmented-pos-group {
+    background: #ede4db;
+    padding: 5px;
+    border-radius: var(--radius-pill);
+    display: flex;
+    gap: 5px;
+    border: 1px solid rgba(74, 46, 27, 0.08);
+  }
+  .segmented-pos-group .btn-check + .btn {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    border-radius: var(--radius-pill) !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    padding: 10px 14px !important;
+    color: var(--text-muted-warm) !important;
+    transition: all 0.18s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: none !important;
+    text-decoration: none !important;
+  }
+  .segmented-pos-group .btn-check + .btn:hover {
+    color: var(--espresso-dark) !important;
+  }
+  .segmented-pos-group .btn-check:checked + .btn {
+    background: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(74, 46, 27, 0.1) !important;
+  }
+  .segmented-pos-group .btn-check#jPin:checked + .btn,
+  .segmented-pos-group .btn-check#cPin:checked + .btn {
+    color: #b45309 !important;
+  }
+  .segmented-pos-group .btn-check#jGk:checked + .btn,
+  .segmented-pos-group .btn-check#cGk:checked + .btn {
+    color: #0e7490 !important;
+  }
+  .segmented-pos-group .btn-check#jCamp:checked + .btn,
+  .segmented-pos-group .btn-check#cCamp:checked + .btn {
+    color: var(--primary) !important;
+  }
+
+  /* Quick Combo Preset Chips (One-Touch Package) */
+  .btn-quick-combo {
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(74, 46, 27, 0.08);
+    background: #ffffff;
+    color: var(--espresso-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: 0 2px 6px rgba(74, 46, 27, 0.04);
+    text-decoration: none;
+    outline: none;
+  }
+  .btn-quick-combo:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(74, 46, 27, 0.12);
+  }
+  .btn-quick-combo:active {
+    transform: scale(0.97);
+  }
+  .btn-quick-combo .badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    transition: all 0.15s ease;
+  }
+  .btn-quick-combo.combo-pin {
+    background: #fff8eb;
+    border-color: #fde68a;
+    color: #b45309;
+  }
+  .btn-quick-combo.combo-pin:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .btn-quick-combo.combo-pin .badge {
+    background: #ffffff !important;
+    color: #b45309 !important;
+    border: 1px solid rgba(180, 83, 9, 0.2);
+  }
+  .btn-quick-combo.combo-gk {
+    background: #f0fdfa;
+    border-color: #a5f3fc;
+    color: #0e7490;
+  }
+  .btn-quick-combo.combo-gk:hover {
+    background: #e0f2fe;
+    border-color: #06b6d4;
+  }
+  .btn-quick-combo.combo-gk .badge {
+    background: #ffffff !important;
+    color: #0e7490 !important;
+    border: 1px solid rgba(14, 116, 144, 0.2);
+  }
+  .btn-quick-combo.combo-campur {
+    background: var(--surface-peach);
+    border-color: var(--surface-peach-border);
+    color: var(--primary);
+  }
+  .btn-quick-combo.combo-campur:hover {
+    background: #fbdac9;
+    border-color: var(--primary);
+  }
+  .btn-quick-combo.combo-campur .badge {
+    background: #ffffff !important;
+    color: var(--primary) !important;
+    border: 1px solid rgba(226, 98, 55, 0.2);
+  }
+
+  /* Preset Chips */
+  .preset-chip {
+    padding: 4px 10px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(74, 46, 27, 0.1);
+    background: #ffffff;
+    color: var(--espresso-dark);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    outline: none;
+  }
+  .preset-chip:hover {
+    border-color: var(--primary);
+    background: var(--surface-peach);
+    color: var(--primary);
+  }
+  .preset-chip.pin-chip {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #b45309;
+  }
+  .preset-chip.pin-chip:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .preset-chip.gk-chip {
+    background: #f0fdfa;
+    border-color: #a5f3fc;
+    color: #0e7490;
+  }
+  .preset-chip.gk-chip:hover {
+    background: #cffafe;
+    border-color: #06b6d4;
+  }
+  .preset-chip.reset-chip {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #ef4444;
+  }
+  .preset-chip.reset-chip:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+  }
+
+  /* Stepper Wrapper & Controls */
+  .stepper-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  .stepper-container .stepper-input {
+    flex: 1;
+    height: 52px;
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    border: 1.5px solid rgba(74, 46, 27, 0.12) !important;
+    color: var(--espresso-dark) !important;
+    text-align: center;
+  }
   .stepper-btn {
     width: 52px;
     height: 52px;
@@ -924,6 +1153,7 @@
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(74, 46, 27, 0.05);
     transition: all 0.12s ease;
+    flex-shrink: 0;
   }
   .stepper-btn:hover:not(:disabled) {
     background: var(--surface-peach) !important;
@@ -933,15 +1163,27 @@
   .stepper-btn:active:not(:disabled) {
     transform: scale(0.92);
   }
-  .stepper-input {
-    height: 52px;
-    font-size: 1.55rem !important;
-    font-weight: 800 !important;
-    border-radius: var(--radius-sm) !important;
-    background: #ffffff !important;
-    border: 1.5px solid rgba(74, 46, 27, 0.12) !important;
-    color: var(--espresso-dark) !important;
-    text-align: center;
+
+  /* Price Pill in Card Header */
+  .counting-price-pill {
+    background: var(--surface-peach) !important;
+    color: var(--primary) !important;
+    border: 1px solid var(--surface-peach-border) !important;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    letter-spacing: 0.02em;
+  }
+
+  /* POS Receipt Box */
+  .pos-receipt-box {
+    background: #fff8f5;
+    border: 1.5px dashed #f4cbba;
+    border-radius: var(--radius-card);
+    padding: 18px 22px;
   }
 
   /* Big POS Confirm CTA */
@@ -970,30 +1212,20 @@
     50% { box-shadow: 0 8px 28px rgba(226, 98, 55, 0.6); transform: translateY(-1px); }
   }
 
-  /* POS Receipt Box */
-  .pos-receipt-box {
-    background: var(--surface-peach);
-    border: 1.5px dashed var(--surface-peach-border);
-    border-radius: var(--radius-card);
-    padding: 18px 22px;
-  }
-
-  /* Preset Chips */
-  .preset-chip {
-    padding: 6px 14px;
-    font-size: 0.82rem;
+  /* Safe Undo Button */
+  .btn-undo-action {
+    background: #ffffff !important;
+    border: 1px solid rgba(239, 68, 68, 0.25) !important;
+    color: #ef4444 !important;
+    border-radius: var(--radius-pill) !important;
     font-weight: 700;
-    border-radius: var(--radius-pill);
-    border: 1px solid rgba(74, 46, 27, 0.1);
-    background: #ffffff;
-    color: var(--espresso-dark);
-    cursor: pointer;
-    transition: all 0.15s ease;
+    padding: 10px 16px;
+    transition: all 0.18s ease;
   }
-  .preset-chip:hover {
-    border-color: var(--primary);
-    background: var(--surface-peach);
-    color: var(--primary);
+  .btn-undo-action:hover {
+    background: #fef2f2 !important;
+    border-color: #ef4444 !important;
+    color: #dc2626 !important;
   }
 
   /* ============================================================ */
